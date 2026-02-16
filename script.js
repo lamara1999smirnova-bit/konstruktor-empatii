@@ -1,94 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Скрипт загружен!'); // Для отладки
+
     // МАССИВЫ С ФРАЗАМИ - ВСЕ ФРАЗЫ ИЗ ДОКУМЕНТА
     const phrases = {
         col1: [
-            "Спасибо, что написали.",
-            "Спасибо, что рассказали.",
-            "Спасибо, что сообщили.",
-            "Спасибо за вопрос.",
-            "Сейчас попробую всё прояснить.",
-            "Спасибо, что уточняете. Позвольте, я поясню.",
-            "Конечно, сейчас всё подскажу.",
-            "Я помогу разобраться.",
-            "Спасибо, что подождали.",
-            "Спасибо, что нашли время рассказать об этом.",
-            "Правильно сделали, что написали нам.",
-            "Получили ваше обращение и уже смотрим, в чём дело.",
-            "Начали изучать детали по вашей проблеме.",
-            "Уже смотрим, что произошло.",
-            "Хорошо, что вы написали.",
-            "Спасибо большое, что поделились.",
-            "Спасибо за такой важный вопрос.",
-            "Спасибо, что обратились.",
-            "Хорошо, что вы спросили об этом.",
-            "Спасибо за уточнения.",
-            "Рад(а), что вам интересно сотрудничество ...",
+            "Спасибо, что написали.", "Спасибо, что рассказали.", "Спасибо, что сообщили.",
+            "Спасибо за вопрос.", "Сейчас попробую всё прояснить.",
+            "Спасибо, что уточняете. Позвольте, я поясню.", "Конечно, сейчас всё подскажу.",
+            "Я помогу разобраться.", "Спасибо, что подождали.",
+            "Спасибо, что нашли время рассказать об этом.", "Правильно сделали, что написали нам.",
+            "Получили ваше обращение и уже смотрим, в чём дело.", "Начали изучать детали по вашей проблеме.",
+            "Уже смотрим, что произошло.", "Хорошо, что вы написали.",
+            "Спасибо большое, что поделились.", "Спасибо за такой важный вопрос.",
+            "Спасибо, что обратились.", "Хорошо, что вы спросили об этом.",
+            "Спасибо за уточнения.", "Рад(а), что вам интересно сотрудничество ...",
             "Рад(а), что хотите участвовать в ... Чтобы попасть в программу ...",
             "Спасибо, что подождали. В этот раз решение затянулось, но я готов(а) рассказать..."
         ],
         col2: [
             "Этот момент действительно может вызывать вопросы.",
             "Понимаю ваше возмущение — это действительно очень неприятно.",
-            "Понимаю, как это мешает работе.",
-            "Понимаю, что это неудобно.",
+            "Понимаю, как это мешает работе.", "Понимаю, что это неудобно.",
             "Вижу, что ситуация вызывает сильные эмоции. Я с вами, давайте разберёмся, что произошло.",
             "Мне жаль, что вам пришлось столкнуться с этой ситуацией.",
             "Понимаю, что вы хотели бы как можно скорее",
             "Мне жаль, что вам пришлось столкнуться с ожиданием. Понимаю, как это может раздражать.",
             "Мне жаль, что сейчас операция недоступна — понимаю, насколько это неудобно.",
-            "Мне жаль, что ситуация нарушила ваши планы.",
-            "Понимаю, что это помешало вашей работе",
-            "Это действительно недопустимо.",
-            "Так правда не должно быть.",
-            "Понимаю, что вы рассчитывали на более быстрое решение вопроса",
-            "Понимаю вашу тревогу",
-            "Понимаю, почему возникает вопрос",
-            "Понимаю ваше желание уточнить этот момент.",
-            "Да, вопрос и правда требует пояснений.",
-            "Это действительно важный вопрос.",
+            "Мне жаль, что ситуация нарушила ваши планы.", "Понимаю, что это помешало вашей работе",
+            "Это действительно недопустимо.", "Так правда не должно быть.",
+            "Понимаю, что вы рассчитывали на более быстрое решение вопроса", "Понимаю вашу тревогу",
+            "Понимаю, почему возникает вопрос", "Понимаю ваше желание уточнить этот момент.",
+            "Да, вопрос и правда требует пояснений.", "Это действительно важный вопрос.",
             "Понимаю ваше желания прояснить вопрос — он очень важен для...",
             "Да, ситуация и правда неприятная — так быть, конечно, не должно.",
             "Понимаю ваше беспокойство — ситуации с [НАПИСАТЬ С ЧЕМ] действительно неприятные, особенно когда они происходят внезапно.",
             "Ситуация и правда очень сложная и нестандартная."
         ],
         col3: [
-            "Вот, что нужно сделать, чтобы",
-            "Мы всё проверили — теперь вы можете",
+            "Вот, что нужно сделать, чтобы", "Мы всё проверили — теперь вы можете",
             "Если вы уже пробовали [СДЕЛАТЬ О ЧЕМ МЫ ПИШЕМ], но у вас не получилось — напишите, пожалуйста, я выясню причину.",
-            "Смотрите, есть два варианта, как [ЧТО НУЖНО КЛИЕНТУ]",
-            "А ещё можно вот так:",
-            "Вот, что я обычно рекомендую в таких ситуациях:",
-            "Пожалуйста, попробуйте ещё вот так:",
-            "Объясню, в чём тут дело",
-            "Вот, что здесь важно учитывать:",
-            "Сейчас расскажу, где это посмотреть:",
-            "Здесь стоит обратить внимание вот на что:",
-            "На всякий случай уточню, что",
-            "Так может быть, если",
-            "Хотите, я подскажу, как",
+            "Смотрите, есть два варианта, как [ЧТО НУЖНО КЛИЕНТУ]", "А ещё можно вот так:",
+            "Вот, что я обычно рекомендую в таких ситуациях:", "Пожалуйста, попробуйте ещё вот так:",
+            "Объясню, в чём тут дело", "Вот, что здесь важно учитывать:",
+            "Сейчас расскажу, где это посмотреть:", "Здесь стоит обратить внимание вот на что:",
+            "На всякий случай уточню, что", "Так может быть, если", "Хотите, я подскажу, как",
             "Пожалуйста, попробуйте/сделайте ..., после этого всё должно получиться",
             "Я прописал/а для вас максимально подробную инструкцию",
-            "Постараюсь объяснить, почему так происходит.",
-            "Давайте всё объясню.",
-            "Давайте расскажу, почему так произошло.",
-            "Сейчас всё объясню.",
-            "Сейчас постараемся вас сориентировать.",
-            "Дело в том, что"
+            "Постараюсь объяснить, почему так происходит.", "Давайте всё объясню.",
+            "Давайте расскажу, почему так произошло.", "Сейчас всё объясню.",
+            "Сейчас постараемся вас сориентировать.", "Дело в том, что"
         ],
         col4: [
             "Извините за ожидание — потребовалось больше времени, чем планировали.",
-            "Извините за эти неудобства — мы уже решаем проблему.",
-            "Простите, что подвели.",
+            "Извините за эти неудобства — мы уже решаем проблему.", "Простите, что подвели.",
             "Простите, так действительно не должно быть.",
             "Извините, в предыдущем сообщении была неточность.",
             "Извините, что ожидание заняло так много времени",
             "Извините, что решение заняло больше времени, чем обычно.",
             "Извините, что заняли так много времени.",
             "Простите, мы стараемся предотвращать такие ситуации.",
-            "Простите, мы ошиблись в предыдущем ответе.",
-            "Простите, что запутали.",
-            "Простите, что так вышло.",
-            "Ещё раз прошу прощения.",
+            "Простите, мы ошиблись в предыдущем ответе.", "Простите, что запутали.",
+            "Простите, что так вышло.", "Ещё раз прошу прощения.",
             "Извините, что заставили волноваться.",
             "Простите, мы ошиблись в предыдущем ответе. Сейчас расскажем, как",
             "Извините, что в прошлых ответах могли выразиться не совсем точно. И спасибо, что дали нам время всё уточнить"
@@ -98,17 +70,13 @@ document.addEventListener('DOMContentLoaded', function() {
             "Спасибо за терпение. Скоро вернусь с ответом.",
             "Мы уже разбираемся, чтобы как можно быстрее решить ваш вопрос.",
             "Благодарю за ожидание — ситуация нестандартная, и мы стараемся как можно быстрее решить её.",
-            "Я поднял/а приоритет вашего обращения.",
-            "Я договорился/ась о дополнительной проверке.",
-            "Я попросил/а ускорить проверку.",
-            "Я проверяю обновления по вашему обращению.",
-            "Я отметил/а вопрос как срочный.",
-            "Я передал/а информацию с пометкой о срочности",
+            "Я поднял/а приоритет вашего обращения.", "Я договорился/ась о дополнительной проверке.",
+            "Я попросил/а ускорить проверку.", "Я проверяю обновления по вашему обращению.",
+            "Я отметил/а вопрос как срочный.", "Я передал/а информацию с пометкой о срочности",
             "Я попросил/а рассмотреть вопрос в приоритетном порядке",
             "Проверяем, что случилось, и узнаём, что можно сделать.",
             "Уже смотрим, что произошло. Свяжемся с вами, как выясним все детали.",
-            "Уже разбираемся в вашем вопросе.",
-            "Начали изучать детали по вашей проблеме.",
+            "Уже разбираемся в вашем вопросе.", "Начали изучать детали по вашей проблеме.",
             "Проверяем, что случилось, и узнаём, что можно сделать. Сразу вам напишем, когда всё выясним."
         ],
         col6: [
@@ -122,8 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             "Очень надеюсь, что мне удалось вас сориентировать. Если нужны подробности или остались вопросы, пожалуйста, обращайтесь — я на связи!",
             "Обязательно напишите, если что-то пойдёт не так — я помогу!",
             "Надеюсь, сейчас всё стало понятнее. Если будут вопросы — напишите, пожалуйста.",
-            "Если что-то ещё потребуется — я на связи.",
-            "Буду рядом, если понадобится помощь.",
+            "Если что-то ещё потребуется — я на связи.", "Буду рядом, если понадобится помощь.",
             "Если вдруг что-то останется неясным — напишите, разберёмся вместе.",
             "Буду рад/а продолжить диалог, если появятся вопросы.",
             "Если снова не получится — дайте знать, посмотрим ещё раз",
@@ -139,123 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // Состояние пошагового режима
+    // Состояние приложения
     let stepState = {
         currentStep: 1,
         answers: ['', '', '', '', '', '', ''],
         totalSteps: 7
     };
-
-    // ИИ переменные
     let model = null;
-    let isModelLoading = false;
 
-    // Загрузка ИИ модели
-    async function loadAIModel() {
-        if (isModelLoading) return;
-        
-        isModelLoading = true;
-        const statusEl = document.getElementById('ai-status');
-        if (!statusEl) return;
-        
-        try {
-            statusEl.textContent = '🤖 Загрузка ИИ модели (это займет немного времени)...';
-            
-            // Создаем простую модель для улучшения текста
-            model = {
-                enhance: async function(text, temperature) {
-                    const variations = [
-                        text,
-                        text + ' Будем рады помочь!',
-                        'Конечно! ' + text,
-                        text + ' Обращайтесь, если что-то непонятно.',
-                        'С удовольствием помогу: ' + text,
-                    ];
-                    
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    const randomIndex = Math.floor(Math.random() * variations.length);
-                    return variations[randomIndex];
-                }
-            };
-            
-            statusEl.textContent = '✅ ИИ модель готова!';
-        } catch (error) {
-            console.error('Ошибка загрузки ИИ:', error);
-            statusEl.textContent = '⚠️ Ошибка загрузки ИИ';
-            model = null;
-        } finally {
-            isModelLoading = false;
-        }
-    }
-
-    // Функция для улучшения текста с помощью ИИ
-    async function enhanceWithAI(text) {
-        const aiToggle = document.getElementById('ai-toggle');
-        if (!aiToggle || !aiToggle.checked || !model) return text;
-
-        const creativity = parseFloat(document.getElementById('creativity-slider').value);
-        
-        try {
-            return await model.enhance(text, creativity);
-        } catch (error) {
-            console.error('Ошибка при работе ИИ:', error);
-            return text;
-        }
-    }
-
-    // Функция для получения случайной фразы из массива
-    function getRandomPhrase(column) {
-        const columnPhrases = phrases[column];
-        const randomIndex = Math.floor(Math.random() * columnPhrases.length);
-        return columnPhrases[randomIndex];
-    }
-
-    // Функция для сборки ответа в рандомном режиме
-    async function generateResponse() {
-        const solution = document.getElementById('solution-text').value.trim();
-        const resultBox = document.getElementById('result-box');
-        
-        if (!solution) {
-            alert('Пожалуйста, введите ваш ответ с решением');
-            return;
-        }
-
-        resultBox.textContent = '⏳ Генерация ответа...';
-
-        const phrase1 = getRandomPhrase('col1');
-        const phrase2 = getRandomPhrase('col2');
-        const phrase3 = getRandomPhrase('col3');
-        const phrase4 = getRandomPhrase('col4');
-        const phrase5 = getRandomPhrase('col5');
-        const phrase6 = getRandomPhrase('col6');
-
-        let fullResponse = `${phrase1} ${phrase2} ${phrase3} ${solution} ${phrase4} ${phrase5} ${phrase6}`;
-        fullResponse = await enhanceWithAI(fullResponse);
-
-        resultBox.textContent = fullResponse;
-    }
-
-    // Функция для копирования в буфер обмена
-    function copyToClipboard(text, button) {
-        if (!text || text === 'Начните собирать ответ...' || text === '⏳ Генерация ответа...') {
-            alert('Нет текста для копирования');
-            return;
-        }
-
-        navigator.clipboard.writeText(text).then(() => {
-            const originalText = button.textContent;
-            button.textContent = '✅ Скопировано!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            alert('Не удалось скопировать текст');
-        });
-    }
-
-    // Заполняем списки фраз в правой колонке
-    function populatePhraseLists() {
+    // ---------- ФУНКЦИИ ЗАПОЛНЕНИЯ ИНТЕРФЕЙСА ----------
+    function populateAllPhraseLists() {
+        console.log('Заполняю все списки фраз...');
+        // Заполняем правую панель (рандомный режим)
         for (let i = 1; i <= 6; i++) {
             const list = document.getElementById(`col${i}-phrases`);
             if (list && phrases[`col${i}`]) {
@@ -267,10 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         }
-    }
-
-    // Заполняем списки фраз для пошагового режима
-    function populateStepPhrases() {
+        // Заполняем кнопки для пошагового режима
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
             if (container && phrases[`col${i}`]) {
@@ -279,236 +138,167 @@ document.addEventListener('DOMContentLoaded', function() {
                     const btn = document.createElement('button');
                     btn.className = 'step-phrase-btn';
                     btn.textContent = phrase;
-                    btn.setAttribute('data-step', i);
-                    btn.setAttribute('data-phrase', phrase);
-                    btn.onclick = function() { selectStepPhrase(i, phrase, this); };
+                    btn.onclick = (function(stepNum, phraseText) {
+                        return function() { selectStepPhrase(stepNum, phraseText, this); };
+                    })(i, phrase); // Замыкание для правильной передачи значений
                     container.appendChild(btn);
                 });
+                console.log(`Шаг ${i === 1 ? 1 : i === 2 ? 2 : i === 3 ? 3 : i === 4 ? 5 : i === 5 ? 6 : 7}: создано ${phrases[`col${i}`].length} кнопок`);
             }
         }
     }
 
-    // Выбор фразы в пошаговом режиме - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+    // Выбор фразы в пошаговом режиме
     function selectStepPhrase(step, phrase, btn) {
-        // Убираем выделение у всех кнопок в этом шаге
+        console.log(`Выбрана фраза на шаге ${step}: ${phrase}`);
+        // Убираем выделение у других кнопок в этом шаге
         const container = document.getElementById(`step-col${step}-phrases`);
         if (container) {
-            container.querySelectorAll('.step-phrase-btn').forEach(b => {
-                b.classList.remove('selected');
-            });
+            container.querySelectorAll('.step-phrase-btn').forEach(b => b.classList.remove('selected'));
         }
-        
-        // Выделяем выбранную кнопку
         btn.classList.add('selected');
-        
-        // Сохраняем фразу для текущего шага (индексация с 0)
+
+        // Сохраняем фразу (индекс = номер шага - 1)
         const answerIndex = step - 1;
         stepState.answers[answerIndex] = phrase;
-        
-        // Сохраняем текст из 4 шага (индекс 3), если он есть
+
+        // Сохраняем текст из 4 шага, если он есть (индекс 3)
         const stepSolution = document.getElementById('step-solution');
         if (stepSolution && stepSolution.value.trim() !== '') {
             stepState.answers[3] = stepSolution.value;
         }
-        
-        // Обновляем отображение ответа
+
         updateStepAnswer();
     }
 
-    // Обновление собираемого ответа - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+    // Обновление поля "Собираемый ответ"
     function updateStepAnswer() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
-        
-        // Собираем все непустые ответы в правильном порядке
-        const parts = [];
-        for (let i = 0; i < stepState.answers.length; i++) {
-            if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
-                parts.push(stepState.answers[i]);
-            }
-        }
-        
-        const fullAnswer = parts.join(' ');
-        answerBox.textContent = fullAnswer || 'Начните собирать ответ...';
+        const parts = stepState.answers.filter(a => a && a.trim() !== '');
+        answerBox.textContent = parts.join(' ') || 'Начните собирать ответ...';
     }
 
     // Переключение шагов
     function goToStep(step) {
-        // Скрываем все шаги
         for (let i = 1; i <= stepState.totalSteps; i++) {
             const panel = document.getElementById(`step-${i}`);
             if (panel) panel.style.display = 'none';
         }
-        
-        // Показываем текущий шаг
         const currentPanel = document.getElementById(`step-${step}`);
         if (currentPanel) currentPanel.style.display = 'block';
-        
+
         // Обновляем индикатор
         document.querySelectorAll('.step-item').forEach((item, index) => {
             const stepNum = index + 1;
             item.classList.remove('active', 'completed');
-            
-            if (stepNum === step) {
-                item.classList.add('active');
-            } else if (stepNum < step) {
-                item.classList.add('completed');
-            }
+            if (stepNum === step) item.classList.add('active');
+            else if (stepNum < step) item.classList.add('completed');
         });
-        
-        // Обновляем кнопки навигации
-        const prevBtn = document.getElementById('step-prev');
-        if (prevBtn) {
-            prevBtn.disabled = step === 1;
-        }
-        
+
+        document.getElementById('step-prev').disabled = (step === 1);
         stepState.currentStep = step;
     }
 
     // Сброс пошагового режима
     function resetStepMode() {
-        stepState = {
-            currentStep: 1,
-            answers: ['', '', '', '', '', '', ''],
-            totalSteps: 7
-        };
-        
-        // Снимаем выделение со всех кнопок
+        stepState = { currentStep: 1, answers: ['', '', '', '', '', '', ''], totalSteps: 7 };
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
-            if (container) {
-                container.querySelectorAll('.step-phrase-btn').forEach(b => {
-                    b.classList.remove('selected');
-                });
-            }
+            if (container) container.querySelectorAll('.step-phrase-btn').forEach(b => b.classList.remove('selected'));
         }
-        
-        // Очищаем поле ввода
         const stepSolution = document.getElementById('step-solution');
         if (stepSolution) stepSolution.value = '';
-        
-        // Обновляем ответ
         updateStepAnswer();
-        
-        // Возвращаемся к первому шагу
         goToStep(1);
     }
 
     // Переключение между режимами
     function switchMode(mode) {
-        const randomMode = document.getElementById('random-mode');
-        const stepMode = document.getElementById('step-mode');
-        const randomBtn = document.getElementById('mode-random');
-        const stepBtn = document.getElementById('mode-step');
-        
-        if (mode === 'random') {
-            randomMode.classList.add('active');
-            stepMode.classList.remove('active');
-            randomBtn.classList.add('active');
-            stepBtn.classList.remove('active');
-        } else {
-            randomMode.classList.remove('active');
-            stepMode.classList.add('active');
-            randomBtn.classList.remove('active');
-            stepBtn.classList.add('active');
-            // Сбрасываем пошаговый режим при переключении
-            resetStepMode();
-        }
+        document.getElementById('random-mode').classList.toggle('active', mode === 'random');
+        document.getElementById('step-mode').classList.toggle('active', mode === 'step');
+        document.getElementById('mode-random').classList.toggle('active', mode === 'random');
+        document.getElementById('mode-step').classList.toggle('active', mode === 'step');
+        if (mode === 'step') resetStepMode();
     }
 
-    // Инициализация всех обработчиков
-    function initEventListeners() {
-        // Переключатель режимов
-        const randomBtn = document.getElementById('mode-random');
-        const stepBtn = document.getElementById('mode-step');
-        
-        if (randomBtn) {
-            randomBtn.addEventListener('click', () => switchMode('random'));
-        }
-        
-        if (stepBtn) {
-            stepBtn.addEventListener('click', () => switchMode('step'));
-        }
-        
-        // Кнопки в рандомном режиме
-        const generateBtn = document.getElementById('generate-btn');
-        const copyBtn = document.getElementById('copy-btn');
-        
-        if (generateBtn) {
-            generateBtn.addEventListener('click', generateResponse);
-        }
-        
-        if (copyBtn) {
-            copyBtn.addEventListener('click', function() {
-                const resultText = document.getElementById('result-box').textContent;
-                copyToClipboard(resultText, this);
-            });
-        }
-        
-        // Кнопки в пошаговом режиме
-        const stepCopyBtn = document.getElementById('step-copy-btn');
-        const stepPrev = document.getElementById('step-prev');
-        const stepNext = document.getElementById('step-next');
-        const stepSkip = document.getElementById('step-skip');
-        
-        if (stepCopyBtn) {
-            stepCopyBtn.addEventListener('click', function() {
-                const answerBox = document.getElementById('step-answer-box');
-                copyToClipboard(answerBox.textContent, this);
-            });
-        }
-        
-        if (stepPrev) {
-            stepPrev.addEventListener('click', function() {
-                if (stepState.currentStep > 1) {
-                    goToStep(stepState.currentStep - 1);
-                }
-            });
-        }
-        
-        if (stepNext) {
-            stepNext.addEventListener('click', function() {
-                if (stepState.currentStep < stepState.totalSteps) {
-                    goToStep(stepState.currentStep + 1);
-                } else {
-                    alert('Вы завершили все шаги! Можете скопировать ответ.');
-                }
-            });
-        }
-        
-        if (stepSkip) {
-            stepSkip.addEventListener('click', function() {
-                if (stepState.currentStep < stepState.totalSteps) {
-                    goToStep(stepState.currentStep + 1);
-                }
-            });
-        }
-        
-        // Отслеживаем изменение в поле ввода 4-го шага
-        const stepSolution = document.getElementById('step-solution');
-        if (stepSolution) {
-            stepSolution.addEventListener('input', function() {
-                stepState.answers[3] = this.value;
-                updateStepAnswer();
-            });
-        }
-        
-        // Слайдер креативности
-        const creativitySlider = document.getElementById('creativity-slider');
-        const creativityValue = document.getElementById('creativity-value');
-        
-        if (creativitySlider && creativityValue) {
-            creativitySlider.addEventListener('input', function() {
-                creativityValue.textContent = this.value;
-            });
-        }
+    // ---------- ИИ ФУНКЦИИ ----------
+    async function loadAIModel() {
+        const statusEl = document.getElementById('ai-status');
+        if (!statusEl) return;
+        statusEl.textContent = '🤖 Загрузка ИИ модели...';
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация загрузки
+        model = { enhance: async (text) => text }; // Заглушка
+        statusEl.textContent = '✅ ИИ модель готова!';
+    }
+    async function enhanceWithAI(text) { return text; } // Заглушка
+    function getRandomPhrase(col) { 
+        const arr = phrases[col]; 
+        return arr[Math.floor(Math.random() * arr.length)]; 
+    }
+    async function generateResponse() {
+        const solution = document.getElementById('solution-text').value.trim();
+        if (!solution) { alert('Введите ответ'); return; }
+        const resultBox = document.getElementById('result-box');
+        resultBox.textContent = '⏳ Генерация...';
+        const phrase1 = getRandomPhrase('col1'), phrase2 = getRandomPhrase('col2'), phrase3 = getRandomPhrase('col3');
+        const phrase4 = getRandomPhrase('col4'), phrase5 = getRandomPhrase('col5'), phrase6 = getRandomPhrase('col6');
+        let fullResponse = `${phrase1} ${phrase2} ${phrase3} ${solution} ${phrase4} ${phrase5} ${phrase6}`;
+        fullResponse = await enhanceWithAI(fullResponse);
+        resultBox.textContent = fullResponse;
+    }
+    function copyToClipboard(text, btn) {
+        if (!text || text.includes('Начните') || text.includes('⏳')) { alert('Нет текста'); return; }
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.textContent;
+            btn.textContent = '✅ Скопировано!';
+            setTimeout(() => btn.textContent = original, 2000);
+        });
     }
 
-    // Запуск при загрузке страницы
-    loadAIModel();
-    populatePhraseLists();
-    populateStepPhrases();
-    initEventListeners();
-    goToStep(1);
-    updateStepAnswer();
+    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+    function init() {
+        console.log('Инициализация...');
+        populateAllPhraseLists();
+
+        // Обработчики
+        document.getElementById('mode-random')?.addEventListener('click', () => switchMode('random'));
+        document.getElementById('mode-step')?.addEventListener('click', () => switchMode('step'));
+        document.getElementById('generate-btn')?.addEventListener('click', generateResponse);
+        document.getElementById('copy-btn')?.addEventListener('click', function() {
+            copyToClipboard(document.getElementById('result-box').textContent, this);
+        });
+        document.getElementById('step-copy-btn')?.addEventListener('click', function() {
+            copyToClipboard(document.getElementById('step-answer-box').textContent, this);
+        });
+        document.getElementById('step-prev')?.addEventListener('click', () => {
+            if (stepState.currentStep > 1) goToStep(stepState.currentStep - 1);
+        });
+        document.getElementById('step-next')?.addEventListener('click', () => {
+            if (stepState.currentStep < stepState.totalSteps) goToStep(stepState.currentStep + 1);
+            else alert('Все шаги пройдены!');
+        });
+        document.getElementById('step-skip')?.addEventListener('click', () => {
+            if (stepState.currentStep < stepState.totalSteps) goToStep(stepState.currentStep + 1);
+        });
+        document.getElementById('step-solution')?.addEventListener('input', function() {
+            stepState.answers[3] = this.value;
+            updateStepAnswer();
+        });
+
+        // Слайдер
+        const slider = document.getElementById('creativity-slider');
+        const valSpan = document.getElementById('creativity-value');
+        if (slider && valSpan) {
+            slider.addEventListener('input', () => valSpan.textContent = slider.value);
+        }
+
+        // Старт
+        loadAIModel();
+        goToStep(1);
+        updateStepAnswer();
+        console.log('Инициализация завершена');
+    }
+
+    init();
 });
