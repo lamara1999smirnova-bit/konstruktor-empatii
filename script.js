@@ -143,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let stepState = {
         currentStep: 1,
         answers: ['', '', '', '', '', '', ''],
-        selectedPhrases: {},
         totalSteps: 7
     };
 
@@ -257,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Заполняем списки фраз в правой колонке
     function populatePhraseLists() {
-        console.log('Заполняю списки фраз для правой панели...');
         for (let i = 1; i <= 6; i++) {
             const list = document.getElementById(`col${i}-phrases`);
             if (list && phrases[`col${i}`]) {
@@ -267,16 +265,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     li.textContent = phrase;
                     list.appendChild(li);
                 });
-                console.log(`Колонка ${i}: добавлено ${phrases[`col${i}`].length} фраз`);
-            } else {
-                console.log(`Колонка ${i}: элемент не найден или нет фраз`);
             }
         }
     }
 
     // Заполняем списки фраз для пошагового режима
     function populateStepPhrases() {
-        console.log('Заполняю списки фраз для пошагового режима...');
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
             if (container && phrases[`col${i}`]) {
@@ -290,14 +284,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     btn.onclick = function() { selectStepPhrase(i, phrase, this); };
                     container.appendChild(btn);
                 });
-                console.log(`Шаг ${i}: добавлено ${phrases[`col${i}`].length} кнопок`);
-            } else {
-                console.log(`Шаг ${i}: элемент не найден или нет фраз`);
             }
         }
     }
 
-    // Выбор фразы в пошаговом режиме
+    // Выбор фразы в пошаговом режиме - ИСПРАВЛЕНО!
     function selectStepPhrase(step, phrase, btn) {
         // Убираем выделение у всех кнопок в этом шаге
         const container = document.getElementById(`step-col${step}-phrases`);
@@ -310,17 +301,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Выделяем выбранную кнопку
         btn.classList.add('selected');
         
-        // Сохраняем фразу
+        // Сохраняем фразу - НЕ ТРОГАЕМ другие шаги!
         stepState.answers[step - 1] = phrase;
+        
+        // Сохраняем текст из 4 шага, если он есть
+        const stepSolution = document.getElementById('step-solution');
+        if (stepSolution && stepSolution.value.trim() !== '') {
+            stepState.answers[3] = stepSolution.value;
+        }
+        
         updateStepAnswer();
     }
 
-    // Обновление собираемого ответа
+    // Обновление собираемого ответа - ИСПРАВЛЕНО!
     function updateStepAnswer() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
         
-        const fullAnswer = stepState.answers.filter(a => a && a.trim() !== '').join(' ');
+        // Фильтруем только непустые ответы
+        const nonEmptyAnswers = stepState.answers.filter(a => a && a.trim() !== '');
+        const fullAnswer = nonEmptyAnswers.join(' ');
         answerBox.textContent = fullAnswer || 'Начните собирать ответ...';
     }
 
@@ -362,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
         stepState = {
             currentStep: 1,
             answers: ['', '', '', '', '', '', ''],
-            selectedPhrases: {},
             totalSteps: 7
         };
         
@@ -477,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Отслеживаем изменение в поле ввода 4-го шага
+        // Отслеживаем изменение в поле ввода 4-го шага - ИСПРАВЛЕНО!
         const stepSolution = document.getElementById('step-solution');
         if (stepSolution) {
             stepSolution.addEventListener('input', function() {
@@ -498,34 +497,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Запуск при загрузке страницы
-    console.log('Скрипт загружен, начинаю инициализацию...');
-    
-    // Загружаем ИИ модель
     loadAIModel();
-    
-    // Заполняем списки фраз
     populatePhraseLists();
     populateStepPhrases();
-    
-    // Инициализируем обработчики
     initEventListeners();
-    
-    // Устанавливаем первый шаг
     goToStep(1);
-    
-    // Обновляем ответ
     updateStepAnswer();
-    
-    console.log('Инициализация завершена');
-});
-
-// Дополнительная инициализация после полной загрузки страницы
-window.addEventListener('load', function() {
-    console.log('Страница полностью загружена');
-    // Проверяем, что все списки заполнены
-    if (typeof populatePhraseLists === 'function') {
-        // Не вызываем напрямую, функция не в глобальной области видимости
-        // Просто логируем
-    }
-    console.log('Все готово!');
 });
