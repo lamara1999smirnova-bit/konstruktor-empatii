@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Выбор фразы в пошаговом режиме - ИСПРАВЛЕНО!
+    // Выбор фразы в пошаговом режиме - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
     function selectStepPhrase(step, phrase, btn) {
         // Убираем выделение у всех кнопок в этом шаге
         const container = document.getElementById(`step-col${step}-phrases`);
@@ -301,26 +301,34 @@ document.addEventListener('DOMContentLoaded', function() {
         // Выделяем выбранную кнопку
         btn.classList.add('selected');
         
-        // Сохраняем фразу - НЕ ТРОГАЕМ другие шаги!
-        stepState.answers[step - 1] = phrase;
+        // Сохраняем фразу для текущего шага (индексация с 0)
+        const answerIndex = step - 1;
+        stepState.answers[answerIndex] = phrase;
         
-        // Сохраняем текст из 4 шага, если он есть
+        // Сохраняем текст из 4 шага (индекс 3), если он есть
         const stepSolution = document.getElementById('step-solution');
         if (stepSolution && stepSolution.value.trim() !== '') {
             stepState.answers[3] = stepSolution.value;
         }
         
+        // Обновляем отображение ответа
         updateStepAnswer();
     }
 
-    // Обновление собираемого ответа - ИСПРАВЛЕНО!
+    // Обновление собираемого ответа - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
     function updateStepAnswer() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
         
-        // Фильтруем только непустые ответы
-        const nonEmptyAnswers = stepState.answers.filter(a => a && a.trim() !== '');
-        const fullAnswer = nonEmptyAnswers.join(' ');
+        // Собираем все непустые ответы в правильном порядке
+        const parts = [];
+        for (let i = 0; i < stepState.answers.length; i++) {
+            if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
+                parts.push(stepState.answers[i]);
+            }
+        }
+        
+        const fullAnswer = parts.join(' ');
         answerBox.textContent = fullAnswer || 'Начните собирать ответ...';
     }
 
@@ -476,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Отслеживаем изменение в поле ввода 4-го шага - ИСПРАВЛЕНО!
+        // Отслеживаем изменение в поле ввода 4-го шага
         const stepSolution = document.getElementById('step-solution');
         if (stepSolution) {
             stepSolution.addEventListener('input', function() {
