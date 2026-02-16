@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Скрипт загружен и работает!');
+    console.log('🚀 Скрипт загружен и работает!');
 
-    // ---------- МАССИВЫ С ФРАЗАМИ ----------
+    // МАССИВЫ С ФРАЗАМИ - ВСЕ ФРАЗЫ ИЗ ДОКУМЕНТА
     const phrases = {
         col1: [
             "Спасибо, что написали.", "Спасибо, что рассказали.", "Спасибо, что сообщили.",
@@ -106,18 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // ---------- СОСТОЯНИЕ ----------
+    // Состояние
     let stepState = {
         currentStep: 1,
         answers: ['', '', '', '', '', '', ''],
         totalSteps: 7
     };
 
-    // ---------- ФУНКЦИИ ДЛЯ ЗАПОЛНЕНИЯ СТРАНИЦЫ ----------
+    // Заполнение всех списков фраз
     function fillAllPhraseLists() {
         console.log('Заполняю списки фраз...');
 
-        // 1. Заполняем правую колонку (для рандомного режима)
+        // Правые колонки
         for (let i = 1; i <= 6; i++) {
             const list = document.getElementById(`col${i}-phrases`);
             if (list && phrases[`col${i}`]) {
@@ -127,67 +127,69 @@ document.addEventListener('DOMContentLoaded', function() {
                     li.textContent = phrase;
                     list.appendChild(li);
                 });
-                console.log(`Колонка ${i}: ${phrases[`col${i}`].length} фраз`);
-            } else {
-                console.warn(`Контейнер col${i}-phrases не найден`);
             }
         }
 
-        // 2. Заполняем кнопки для пошагового режима
-        for (let i = 1; i <= 6; i++) {
-            const container = document.getElementById(`step-col${i}-phrases`);
-            if (container && phrases[`col${i}`]) {
+        // Кнопки для шагов - ВАЖНО: правильное соответствие!
+        const stepToColMap = {
+            1: 1, // шаг 1 -> колонка 1
+            2: 2, // шаг 2 -> колонка 2
+            3: 3, // шаг 3 -> колонка 3
+            5: 4, // шаг 5 -> колонка 4 (ИСПРАВЛЕНО!)
+            6: 5, // шаг 6 -> колонка 5
+            7: 6  // шаг 7 -> колонка 6
+        };
+
+        for (let step = 1; step <= 7; step++) {
+            // Пропускаем шаг 4 (это текстовое поле)
+            if (step === 4) continue;
+            
+            const colIndex = stepToColMap[step];
+            const container = document.getElementById(`step-col${colIndex}-phrases`);
+            
+            if (container && phrases[`col${colIndex}`]) {
                 container.innerHTML = '';
-                phrases[`col${i}`].forEach(phrase => {
+                phrases[`col${colIndex}`].forEach(phrase => {
                     const btn = document.createElement('button');
                     btn.className = 'step-phrase-btn';
                     btn.textContent = phrase;
-                    btn.onclick = (function(stepNum, phraseText) {
+                    btn.onclick = (function(s, p) {
                         return function() {
-                            selectPhrase(stepNum, phraseText, this);
+                            // Убираем выделение у других кнопок
+                            document.querySelectorAll(`#step-col${stepToColMap[s]}-phrases .step-phrase-btn`).forEach(b => {
+                                b.classList.remove('selected');
+                            });
+                            this.classList.add('selected');
+                            
+                            // Сохраняем фразу
+                            stepState.answers[s - 1] = p;
+                            
+                            // Обновляем текстовое поле
+                            updateAnswerBox();
                         };
-                    })(i, phrase);
+                    })(step, phrase);
                     container.appendChild(btn);
                 });
-                console.log(`Шаг для колонки ${i}: создано кнопок`);
-            } else {
-                console.warn(`Контейнер step-col${i}-phrases не найден`);
+                console.log(`Шаг ${step} (колонка ${colIndex}) готов`);
             }
         }
     }
 
-    // Выбор фразы
-    function selectPhrase(step, phrase, btn) {
-        console.log(`Выбрана фраза для шага ${step}`);
-
-        // Убираем выделение с других кнопок
-        const container = document.getElementById(`step-col${step}-phrases`);
-        if (container) {
-            container.querySelectorAll('.step-phrase-btn').forEach(b => {
-                b.classList.remove('selected');
-            });
-        }
-        btn.classList.add('selected');
-
-        // Сохраняем фразу (индексация с 0)
-        stepState.answers[step - 1] = phrase;
-
-        // Сохраняем текст из 4 шага, если он есть
-        const stepSolution = document.getElementById('step-solution');
-        if (stepSolution && stepSolution.value.trim() !== '') {
-            stepState.answers[3] = stepSolution.value;
-        }
-
-        updateAnswerBox();
-    }
-
-    // Обновление поля с собираемым ответом
+    // Обновление поля ответа (ТЕПЕРЬ РЕДАКТИРУЕМОЕ!)
     function updateAnswerBox() {
-        const box = document.getElementById('step-answer-box');
-        if (!box) return;
-
+        const answerBox = document.getElementById('step-answer-box');
+        if (!answerBox) return;
+        
         const parts = stepState.answers.filter(a => a && a.trim() !== '');
-        box.textContent = parts.join(' ') || 'Начните собирать ответ...';
+        const text = parts.join(' ') || 'Начните собирать ответ...';
+        
+        // Обновляем значение, но не перезаписываем, если пользователь редактирует
+        if (!answerBox._isEditing) {
+            answerBox.value = text;
+        }
+        
+        // Сохраняем в состояние при изменении
+        stepState.answers[7] = answerBox.value; // сохраняем полный текст
     }
 
     // Переключение шагов
@@ -196,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const panel = document.getElementById(`step-${i}`);
             if (panel) panel.style.display = 'none';
         }
-
+        
         const current = document.getElementById(`step-${step}`);
         if (current) current.style.display = 'block';
 
@@ -212,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         stepState.currentStep = step;
     }
 
-    // Сброс пошагового режима
+    // Сброс
     function resetStepMode() {
         stepState = {
             currentStep: 1,
@@ -220,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
             totalSteps: 7
         };
 
+        // Снимаем выделение
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
             if (container) {
@@ -229,67 +232,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        const stepSolution = document.getElementById('step-solution');
-        if (stepSolution) stepSolution.value = '';
-
-        updateAnswerBox();
-        goToStep(1);
+        document.getElementById('step-solution').value = '';
+        document.getElementById('step-answer-box').value = 'Начните собирать ответ...';
     }
 
     // Переключение режимов
     function switchMode(mode) {
-        const randomMode = document.getElementById('random-mode');
-        const stepMode = document.getElementById('step-mode');
-        const randomBtn = document.getElementById('mode-random');
-        const stepBtn = document.getElementById('mode-step');
-
-        if (mode === 'random') {
-            randomMode.classList.add('active');
-            stepMode.classList.remove('active');
-            randomBtn.classList.add('active');
-            stepBtn.classList.remove('active');
-        } else {
-            randomMode.classList.remove('active');
-            stepMode.classList.add('active');
-            randomBtn.classList.remove('active');
-            stepBtn.classList.add('active');
-            resetStepMode();
-        }
+        document.getElementById('random-mode').classList.toggle('active', mode === 'random');
+        document.getElementById('step-mode').classList.toggle('active', mode === 'step');
+        document.getElementById('mode-random').classList.toggle('active', mode === 'random');
+        document.getElementById('mode-step').classList.toggle('active', mode === 'step');
+        if (mode === 'step') resetStepMode();
     }
 
     // Рандомная генерация
     function getRandomPhrase(col) {
-        const arr = phrases[col];
-        return arr[Math.floor(Math.random() * arr.length)];
+        return phrases[col][Math.floor(Math.random() * phrases[col].length)];
     }
 
     async function generateResponse() {
         const solution = document.getElementById('solution-text').value.trim();
-        if (!solution) {
-            alert('Введите ваш ответ с решением');
-            return;
-        }
-
+        if (!solution) { alert('Введите ответ'); return; }
+        
         document.getElementById('result-box').textContent = '⏳ Генерация...';
-
-        const p1 = getRandomPhrase('col1');
-        const p2 = getRandomPhrase('col2');
-        const p3 = getRandomPhrase('col3');
-        const p4 = getRandomPhrase('col4');
-        const p5 = getRandomPhrase('col5');
-        const p6 = getRandomPhrase('col6');
-
-        const full = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
-        document.getElementById('result-box').textContent = full;
+        const p1 = getRandomPhrase('col1'), p2 = getRandomPhrase('col2'), p3 = getRandomPhrase('col3');
+        const p4 = getRandomPhrase('col4'), p5 = getRandomPhrase('col5'), p6 = getRandomPhrase('col6');
+        document.getElementById('result-box').textContent = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
     }
 
     // Копирование
     function copyText(text, btn) {
         if (!text || text.includes('Начните') || text.includes('⏳')) {
-            alert('Нет текста для копирования');
+            alert('Нет текста');
             return;
         }
-
         navigator.clipboard.writeText(text).then(() => {
             const orig = btn.textContent;
             btn.textContent = '✅ Скопировано!';
@@ -297,26 +273,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ---------- ЗАПУСК ----------
+    // Инициализация
     fillAllPhraseLists();
 
-    // Навешиваем обработчики
+    // Обработчики
     document.getElementById('mode-random').addEventListener('click', () => switchMode('random'));
     document.getElementById('mode-step').addEventListener('click', () => switchMode('step'));
-
     document.getElementById('generate-btn').addEventListener('click', generateResponse);
     document.getElementById('copy-btn').addEventListener('click', function() {
         copyText(document.getElementById('result-box').textContent, this);
     });
-
     document.getElementById('step-copy-btn').addEventListener('click', function() {
-        copyText(document.getElementById('step-answer-box').textContent, this);
+        copyText(document.getElementById('step-answer-box').value, this);
     });
-
     document.getElementById('step-prev').addEventListener('click', () => {
         if (stepState.currentStep > 1) goToStep(stepState.currentStep - 1);
     });
-
     document.getElementById('step-next').addEventListener('click', () => {
         if (stepState.currentStep < stepState.totalSteps) {
             goToStep(stepState.currentStep + 1);
@@ -324,36 +296,39 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Все шаги пройдены!');
         }
     });
-
     document.getElementById('step-skip').addEventListener('click', () => {
         if (stepState.currentStep < stepState.totalSteps) {
             goToStep(stepState.currentStep + 1);
         }
     });
-
     document.getElementById('step-solution').addEventListener('input', function() {
         stepState.answers[3] = this.value;
         updateAnswerBox();
     });
+    
+    // РЕДАКТИРУЕМОЕ ПОЛЕ - отслеживаем изменения
+    const answerBox = document.getElementById('step-answer-box');
+    if (answerBox) {
+        answerBox.addEventListener('focus', () => answerBox._isEditing = true);
+        answerBox.addEventListener('blur', () => {
+            answerBox._isEditing = false;
+            stepState.answers[7] = answerBox.value;
+        });
+        answerBox.addEventListener('input', () => {
+            stepState.answers[7] = answerBox.value;
+        });
+    }
 
     // Слайдер
     const slider = document.getElementById('creativity-slider');
     const valSpan = document.getElementById('creativity-value');
     if (slider && valSpan) {
-        slider.addEventListener('input', () => {
-            valSpan.textContent = slider.value;
-        });
+        slider.addEventListener('input', () => valSpan.textContent = slider.value);
     }
 
-    // Статус ИИ (заглушка)
-    const aiStatus = document.getElementById('ai-status');
-    if (aiStatus) {
-        aiStatus.textContent = '✅ ИИ модель готова!';
-    }
-
-    // Старт
+    document.getElementById('ai-status').textContent = '✅ ИИ модель готова!';
+    
     goToStep(1);
     updateAnswerBox();
-
     console.log('Инициализация завершена!');
 });
