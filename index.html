@@ -15,134 +15,217 @@
             <p class="subtitle">Помогает сделать шаблонные ответы живыми и человечными</p>
         </header>
 
-        <div class="main-content">
-            <!-- Левая колонка: ввод и инструкция -->
-            <div class="left-panel">
-                <div class="input-card">
-                    <h3>✏️ Ваш ответ с решением</h3>
-                    <p class="hint">Введите сюда фактуру — то, что реально поможет клиенту решить проблему</p>
-                    <textarea 
-                        id="solution-text" 
-                        placeholder="Например: нужно перезагрузить роутер и проверить подключение по Wi-Fi"
-                        rows="4"
-                    >нужно перезагрузить роутер и проверить подключение по Wi-Fi</textarea>
-                    
-                    <!-- Новые настройки ИИ -->
-                    <div class="ai-settings">
-                        <h4>⚙️ Настройки ИИ</h4>
-                        <div class="setting-item">
-                            <label class="switch">
-                                <input type="checkbox" id="ai-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
-                            <span class="setting-label">ИИ-улучшение</span>
+        <!-- Переключатель режимов -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" id="mode-random">🎲 Рандомный ответ</button>
+            <button class="mode-btn" id="mode-step">👣 Пошаговый сбор</button>
+        </div>
+
+        <!-- Рандомный режим (виден по умолчанию) -->
+        <div id="random-mode" class="mode-content active">
+            <div class="main-content">
+                <!-- Левая колонка: ввод и инструкция -->
+                <div class="left-panel">
+                    <div class="input-card">
+                        <h3>✏️ Ваш ответ с решением</h3>
+                        <p class="hint">Введите сюда фактуру — то, что реально поможет клиенту решить проблему</p>
+                        <textarea 
+                            id="solution-text" 
+                            placeholder="Например: нужно перезагрузить роутер и проверить подключение по Wi-Fi"
+                            rows="4"
+                        >нужно перезагрузить роутер и проверить подключение по Wi-Fi</textarea>
+                        
+                        <!-- Настройки ИИ -->
+                        <div class="ai-settings">
+                            <h4>⚙️ Настройки ИИ</h4>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="ai-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label">ИИ-улучшение</span>
+                            </div>
+                            <div class="setting-item">
+                                <label for="creativity-slider">Креативность:</label>
+                                <input type="range" id="creativity-slider" min="0.1" max="1.0" step="0.1" value="0.7">
+                                <span id="creativity-value">0.7</span>
+                            </div>
+                            <div id="ai-status" class="ai-status">🤖 Загрузка ИИ модели...</div>
                         </div>
-                        <div class="setting-item">
-                            <label for="creativity-slider">Креативность:</label>
-                            <input type="range" id="creativity-slider" min="0.1" max="1.0" step="0.1" value="0.7">
-                            <span id="creativity-value">0.7</span>
+
+                        <div class="order-info">
+                            <h4>Порядок сборки ответа:</h4>
+                            <ol class="order-list">
+                                <li><span class="col-badge col1">Колонка 1</span> Начинаем диалог</li>
+                                <li><span class="col-badge col2">Колонка 2</span> Понимание/сочувствие</li>
+                                <li><span class="col-badge col3">Колонка 3</span> Продолжаем диалог</li>
+                                <li><span class="col-badge col4">Колонка 4</span> Извинения (если уместно)</li>
+                                <li><span class="col-badge col5">Колонка 5</span> Показываем активную работу</li>
+                                <li><span class="col-badge col6">Колонка 6</span> Завершаем диалог</li>
+                            </ol>
+                            <p class="note">Ваш ответ с решением вставляется <strong>после колонки 3</strong> (перед извинениями)</p>
                         </div>
-                        <div id="ai-status" class="ai-status">🤖 Загрузка ИИ модели...</div>
+
+                        <button id="generate-btn" class="generate-btn">
+                            <span>🎲</span>
+                            Собрать ответ с ИИ
+                        </button>
                     </div>
 
-                    <div class="order-info">
-                        <h4>Порядок сборки ответа:</h4>
-                        <ol class="order-list">
-                            <li><span class="col-badge col1">Колонка 1</span> Начинаем диалог</li>
-                            <li><span class="col-badge col2">Колонка 2</span> Понимание/сочувствие</li>
-                            <li><span class="col-badge col3">Колонка 3</span> Продолжаем диалог</li>
-                            <li><span class="col-badge col4">Колонка 4</span> Извинения (если уместно)</li>
-                            <li><span class="col-badge col5">Колонка 5</span> Показываем активную работу</li>
-                            <li><span class="col-badge col6">Колонка 6</span> Завершаем диалог</li>
-                        </ol>
-                        <p class="note">Ваш ответ с решением вставляется <strong>после колонки 3</strong> (перед извинениями)</p>
+                    <div class="result-card">
+                        <h3>📋 Готовый ответ:</h3>
+                        <div class="result-box" id="result-box">
+                            <!-- Сюда будет вставляться результат -->
+                        </div>
+                        <button id="copy-btn" class="copy-btn">📋 Копировать ответ</button>
                     </div>
-
-                    <button id="generate-btn" class="generate-btn">
-                        <span>🎲</span>
-                        Собрать ответ с ИИ
-                    </button>
                 </div>
 
-                <div class="result-card">
-                    <h3>📋 Готовый ответ:</h3>
-                    <div class="result-box" id="result-box">
-                        <!-- Сюда будет вставляться результат -->
+                <!-- Правая колонка: предпросмотр всех фраз -->
+                <div class="right-panel">
+                    <h3>📚 Все фразы конструктора</h3>
+                    <p class="hint">При генерации выбирается по одной случайной фразе из каждой колонки</p>
+                    
+                    <div class="columns-preview">
+                        <!-- Колонка 1 -->
+                        <div class="preview-col">
+                            <div class="col-header col1-header">
+                                <span class="col-number">1</span>
+                                <h4>Начинаем диалог</h4>
+                            </div>
+                            <ul class="phrases-list" id="col1-phrases"></ul>
+                        </div>
+
+                        <!-- Колонка 2 -->
+                        <div class="preview-col">
+                            <div class="col-header col2-header">
+                                <span class="col-number">2</span>
+                                <h4>Понимание/сочувствие</h4>
+                            </div>
+                            <ul class="phrases-list" id="col2-phrases"></ul>
+                        </div>
+
+                        <!-- Колонка 3 -->
+                        <div class="preview-col">
+                            <div class="col-header col3-header">
+                                <span class="col-number">3</span>
+                                <h4>Продолжаем диалог</h4>
+                            </div>
+                            <ul class="phrases-list" id="col3-phrases"></ul>
+                        </div>
+
+                        <!-- Колонка 4 -->
+                        <div class="preview-col">
+                            <div class="col-header col4-header">
+                                <span class="col-number">4</span>
+                                <h4>Извинения</h4>
+                            </div>
+                            <ul class="phrases-list" id="col4-phrases"></ul>
+                        </div>
+
+                        <!-- Колонка 5 -->
+                        <div class="preview-col">
+                            <div class="col-header col5-header">
+                                <span class="col-number">5</span>
+                                <h4>Активная работа</h4>
+                            </div>
+                            <ul class="phrases-list" id="col5-phrases"></ul>
+                        </div>
+
+                        <!-- Колонка 6 -->
+                        <div class="preview-col">
+                            <div class="col-header col6-header">
+                                <span class="col-number">6</span>
+                                <h4>Завершение</h4>
+                            </div>
+                            <ul class="phrases-list" id="col6-phrases"></ul>
+                        </div>
                     </div>
-                    <button id="copy-btn" class="copy-btn">📋 Копировать ответ</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Правая колонка: предпросмотр всех фраз -->
-            <div class="right-panel">
-                <h3>📚 Все фразы конструктора</h3>
-                <p class="hint">При генерации выбирается по одной случайной фразе из каждой колонки</p>
-                
-                <div class="columns-preview">
-                    <!-- Колонка 1 -->
-                    <div class="preview-col">
-                        <div class="col-header col1-header">
-                            <span class="col-number">1</span>
-                            <h4>Начинаем диалог</h4>
-                        </div>
-                        <ul class="phrases-list" id="col1-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+        <!-- Пошаговый режим (скрыт по умолчанию) -->
+        <div id="step-mode" class="mode-content">
+            <div class="step-container">
+                <!-- Индикатор шагов -->
+                <div class="step-indicator">
+                    <div class="step-progress">
+                        <div class="step-item" data-step="1">1</div>
+                        <div class="step-item" data-step="2">2</div>
+                        <div class="step-item" data-step="3">3</div>
+                        <div class="step-item" data-step="4">4</div>
+                        <div class="step-item" data-step="5">5</div>
+                        <div class="step-item" data-step="6">6</div>
+                        <div class="step-item" data-step="7">7</div>
+                    </div>
+                </div>
+
+                <!-- Текущий шаг -->
+                <div class="step-content">
+                    <!-- Шаг 1: Колонка 1 -->
+                    <div id="step-1" class="step-panel">
+                        <h2>Шаг 1: Начинаем диалог</h2>
+                        <p class="step-hint">Выберите подходящую фразу для начала разговора</p>
+                        <div class="step-phrases" id="step-col1-phrases"></div>
                     </div>
 
-                    <!-- Колонка 2 -->
-                    <div class="preview-col">
-                        <div class="col-header col2-header">
-                            <span class="col-number">2</span>
-                            <h4>Понимание/сочувствие</h4>
-                        </div>
-                        <ul class="phrases-list" id="col2-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+                    <!-- Шаг 2: Колонка 2 -->
+                    <div id="step-2" class="step-panel" style="display: none;">
+                        <h2>Шаг 2: Понимание/сочувствие</h2>
+                        <p class="step-hint">Выберите фразу, показывающую понимание проблемы</p>
+                        <div class="step-phrases" id="step-col2-phrases"></div>
                     </div>
 
-                    <!-- Колонка 3 -->
-                    <div class="preview-col">
-                        <div class="col-header col3-header">
-                            <span class="col-number">3</span>
-                            <h4>Продолжаем диалог</h4>
-                        </div>
-                        <ul class="phrases-list" id="col3-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+                    <!-- Шаг 3: Колонка 3 -->
+                    <div id="step-3" class="step-panel" style="display: none;">
+                        <h2>Шаг 3: Продолжаем диалог</h2>
+                        <p class="step-hint">Выберите связующую фразу</p>
+                        <div class="step-phrases" id="step-col3-phrases"></div>
                     </div>
 
-                    <!-- Колонка 4 -->
-                    <div class="preview-col">
-                        <div class="col-header col4-header">
-                            <span class="col-number">4</span>
-                            <h4>Извинения</h4>
-                        </div>
-                        <ul class="phrases-list" id="col4-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+                    <!-- Шаг 4: Ваш ответ -->
+                    <div id="step-4" class="step-panel" style="display: none;">
+                        <h2>Шаг 4: Ваш ответ с решением</h2>
+                        <p class="step-hint">Введите фактуру — то, что реально поможет клиенту</p>
+                        <textarea id="step-solution" class="step-textarea" placeholder="Например: нужно перезагрузить роутер и проверить подключение по Wi-Fi" rows="4"></textarea>
                     </div>
 
-                    <!-- Колонка 5 -->
-                    <div class="preview-col">
-                        <div class="col-header col5-header">
-                            <span class="col-number">5</span>
-                            <h4>Активная работа</h4>
-                        </div>
-                        <ul class="phrases-list" id="col5-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+                    <!-- Шаг 5: Колонка 4 -->
+                    <div id="step-5" class="step-panel" style="display: none;">
+                        <h2>Шаг 5: Извинения</h2>
+                        <p class="step-hint">Выберите фразу для извинений (если уместно)</p>
+                        <div class="step-phrases" id="step-col4-phrases"></div>
                     </div>
 
-                    <!-- Колонка 6 -->
-                    <div class="preview-col">
-                        <div class="col-header col6-header">
-                            <span class="col-number">6</span>
-                            <h4>Завершение</h4>
+                    <!-- Шаг 6: Колонка 5 -->
+                    <div id="step-6" class="step-panel" style="display: none;">
+                        <h2>Шаг 6: Активная работа</h2>
+                        <p class="step-hint">Выберите фразу, показывающую, что вы решаете вопрос</p>
+                        <div class="step-phrases" id="step-col5-phrases"></div>
+                    </div>
+
+                    <!-- Шаг 7: Колонка 6 -->
+                    <div id="step-7" class="step-panel" style="display: none;">
+                        <h2>Шаг 7: Завершение</h2>
+                        <p class="step-hint">Выберите завершающую фразу</p>
+                        <div class="step-phrases" id="step-col6-phrases"></div>
+                    </div>
+
+                    <!-- Собираемый ответ -->
+                    <div class="step-answer">
+                        <h3>📝 Собираемый ответ:</h3>
+                        <div class="step-answer-box" id="step-answer-box">
+                            <!-- Здесь будет собираться ответ -->
                         </div>
-                        <ul class="phrases-list" id="col6-phrases">
-                            <!-- Фразы будут добавлены через JS -->
-                        </ul>
+                        <button id="step-copy-btn" class="copy-btn">📋 Копировать ответ</button>
+                    </div>
+
+                    <!-- Кнопки навигации -->
+                    <div class="step-navigation">
+                        <button id="step-prev" class="step-btn" disabled>◀ Назад</button>
+                        <button id="step-skip" class="step-btn">⏭ Пропустить шаг</button>
+                        <button id="step-next" class="step-btn">Далее ▶</button>
                     </div>
                 </div>
             </div>
