@@ -145,7 +145,7 @@
             </div>
         </div>
 
-        <!-- Пошаговый режим (скрыт по умолчанию) -->
+        <!-- Пошаговый режим -->
         <div id="step-mode" class="mode-content">
             <div class="step-container">
                 <!-- Индикатор шагов -->
@@ -163,21 +163,21 @@
 
                 <!-- Контейнер для всех шагов -->
                 <div class="step-content">
-                    <!-- Шаг 1: Колонка 1 -->
+                    <!-- Шаг 1: Колонка 1 (Начинаем диалог) -->
                     <div id="step-1" class="step-panel">
                         <h2>Шаг 1: Начинаем диалог</h2>
                         <p class="step-hint">Выберите подходящую фразу для начала разговора</p>
                         <div class="step-phrases" id="step-col1-phrases"></div>
                     </div>
 
-                    <!-- Шаг 2: Колонка 2 -->
+                    <!-- Шаг 2: Колонка 2 (Понимание/сочувствие) -->
                     <div id="step-2" class="step-panel" style="display: none;">
                         <h2>Шаг 2: Понимание/сочувствие</h2>
                         <p class="step-hint">Выберите фразу, показывающую понимание проблемы</p>
                         <div class="step-phrases" id="step-col2-phrases"></div>
                     </div>
 
-                    <!-- Шаг 3: Колонка 3 -->
+                    <!-- Шаг 3: Колонка 3 (Продолжаем диалог) -->
                     <div id="step-3" class="step-panel" style="display: none;">
                         <h2>Шаг 3: Продолжаем диалог</h2>
                         <p class="step-hint">Выберите связующую фразу</p>
@@ -191,21 +191,21 @@
                         <textarea id="step-solution" class="step-textarea" placeholder="Например: нужно перезагрузить роутер и проверить подключение по Wi-Fi" rows="4"></textarea>
                     </div>
 
-                    <!-- Шаг 5: Колонка 4 (Извинения) -->
-<div id="step-5" class="step-panel" style="display: none;">
-    <h2>Шаг 5: Извинения</h2>
-    <p class="step-hint">Выберите фразу для извинений (если уместно)</p>
-    <div class="step-phrases" id="step-col4-phrases"></div>  <!-- ВАЖНО: id="step-col4-phrases" -->
-</div>
+                    <!-- ШАГ 5: Колонка 4 (Извинения) - ВАЖНО: id="step-col4-phrases" -->
+                    <div id="step-5" class="step-panel" style="display: none;">
+                        <h2>Шаг 5: Извинения</h2>
+                        <p class="step-hint">Выберите фразу для извинений (если уместно)</p>
+                        <div class="step-phrases" id="step-col4-phrases"></div>
+                    </div>
 
-                    <!-- Шаг 6: Колонка 5 -->
+                    <!-- Шаг 6: Колонка 5 (Активная работа) -->
                     <div id="step-6" class="step-panel" style="display: none;">
                         <h2>Шаг 6: Активная работа</h2>
                         <p class="step-hint">Выберите фразу, показывающую, что вы решаете вопрос</p>
                         <div class="step-phrases" id="step-col5-phrases"></div>
                     </div>
 
-                    <!-- Шаг 7: Колонка 6 -->
+                    <!-- Шаг 7: Колонка 6 (Завершение) -->
                     <div id="step-7" class="step-panel" style="display: none;">
                         <h2>Шаг 7: Завершение</h2>
                         <p class="step-hint">Выберите завершающую фразу</p>
