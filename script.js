@@ -321,3 +321,245 @@ function populatePhraseLists() {
         }
     }, 1000);
 });
+/* Переключатель режимов */
+.mode-switcher {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.mode-btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 50px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.mode-btn.active {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border-color: transparent;
+}
+
+.mode-content {
+    display: none;
+}
+
+.mode-content.active {
+    display: block;
+}
+
+/* Пошаговый режим */
+.step-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.step-indicator {
+    margin-bottom: 30px;
+}
+
+.step-progress {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.step-progress::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.step-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s;
+}
+
+.step-item.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.step-item.completed {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.step-content {
+    margin-top: 30px;
+}
+
+.step-panel {
+    animation: fadeIn 0.5s;
+}
+
+.step-hint {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.step-phrases {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 30px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.step-phrase-btn {
+    padding: 12px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.step-phrase-btn:hover {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.step-phrase-btn.selected {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.step-textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    resize: vertical;
+}
+
+.step-textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.step-answer {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 30px 0;
+}
+
+.step-answer-box {
+    min-height: 100px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    margin: 15px 0;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.step-navigation {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.step-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.step-btn:first-child {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.step-btn:first-child:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+.step-btn:first-child:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.step-btn:last-child {
+    background: #2563eb;
+    color: white;
+}
+
+.step-btn:last-child:hover {
+    background: #1d4ed8;
+}
+
+#step-skip {
+    background: #f59e0b;
+    color: white;
+}
+
+#step-skip:hover {
+    background: #d97706;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .step-phrases {
+        grid-template-columns: 1fr;
+    }
+    
+    .step-navigation {
+        flex-direction: column;
+    }
+}
