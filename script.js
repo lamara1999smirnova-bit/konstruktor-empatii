@@ -106,131 +106,43 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // ========== КОМБИНИРОВАННЫЙ ИИ ==========
+    // ========== ПРОСТОЙ КОРРЕКТОР ТЕКСТА ==========
     
-    // 1. Эмпатичный шаблонизатор
-    const empathyRules = {
-        позитивный: {
-            приветствие: ["Рад(а) помочь!", "С удовольствием отвечу!", "Всегда рады помочь!"],
-            поддержка: ["Отлично!", "Замечательно!", "Прекрасно, что обратились!"],
-            завершение: ["Хорошего дня!", "Рад(а) был(а) полезен(на)!", "Обращайтесь ещё!"]
-        },
-        нейтральный: {
-            приветствие: ["Здравствуйте!", "Добрый день!", "Рады приветствовать!"],
-            поддержка: ["Давайте разберёмся!", "Сейчас всё объясню!", "Вот что нужно сделать:"],
-            завершение: ["Всего доброго!", "Удачи в решении!", "Будем на связи!"]
-        },
-        негативный: {
-            приветствие: ["Понимаю ваше беспокойство", "Мне жаль это слышать", "Спасибо, что сообщили"],
-            поддержка: ["Обязательно поможем!", "Разберёмся в ситуации!", "Всё исправим!"],
-            завершение: ["Надеюсь, ситуация прояснилась", "Буду рядом, если нужна помощь", "Обращайтесь в любой момент"]
-        }
-    };
-
-    // 2. N-граммный анализатор
-    const wordPairs = {
-        'спасибо': ['пожалуйста', 'обращайтесь', 'рады'],
-        'извините': ['понимаем', 'ситуацию', 'исправим'],
-        'помочь': ['всегда', 'рады', 'готовы'],
-        'вопрос': ['ответить', 'уточнить', 'объяснить'],
-        'проблема': ['решить', 'разобраться', 'устранить'],
-        'помощь': ['нужна', 'понадобится', 'обращайтесь'],
-        'ответ': ['полный', 'подробный', 'развёрнутый'],
-        'решение': ['нашли', 'предложили', 'подобрали']
-    };
-
-    function analyzeTone(text) {
-        const words = text.toLowerCase();
-        if (words.includes('извин') || words.includes('простит') || 
-            words.includes('проблем') || words.includes('ошибк')) {
-            return 'негативный';
-        }
-        if (words.includes('спасиб') || words.includes('отличн') || 
-            words.includes('здоров')) {
-            return 'позитивный';
-        }
-        return 'нейтральный';
-    }
-
-    function improveWithEmpathy(text) {
-        const tone = analyzeTone(text);
-        const rule = empathyRules[tone];
-        
-        // Добавляем эмпатичные фразы в начало и конец, если их там нет
-        let improved = text;
-        
-        const hasGreeting = rule.приветствие.some(g => text.includes(g));
-        if (!hasGreeting && Math.random() > 0.5) {
-            improved = rule.приветствие[Math.floor(Math.random() * rule.приветствие.length)] + ' ' + improved;
-        }
-        
-        const hasClosing = rule.завершение.some(c => text.includes(c));
-        if (!hasClosing && Math.random() > 0.5) {
-            improved = improved + ' ' + rule.завершение[Math.floor(Math.random() * rule.завершение.length)];
-        }
-        
-        return improved;
-    }
-
-    function improveWithNGram(text) {
-        let words = text.split(' ');
-        let enhanced = [];
-        
-        for (let i = 0; i < words.length; i++) {
-            enhanced.push(words[i]);
-            
-            // Добавляем связанные слова с небольшой вероятностью
-            const cleanWord = words[i].toLowerCase().replace(/[.,!?]/g, '');
-            if (wordPairs[cleanWord] && Math.random() > 0.7) {
-                const suggestions = wordPairs[cleanWord];
-                const next = suggestions[Math.floor(Math.random() * suggestions.length)];
-                enhanced.push(next);
-            }
-        }
-        
-        return enhanced.join(' ');
-    }
-
-    function improveWithRussianRules(text) {
-        let improved = text;
-        
-        // Исправляем типографику
-        improved = improved
-            .replace(/\s+([,.!?:;])/g, '$1') // Убираем пробелы перед знаками
-            .replace(/([,.!?:;])([а-яa-z])/g, '$1 $2') // Добавляем пробелы после знаков
-            .replace(/\.\.+/g, '…') // Троеточие
-            .replace(/\s+/g, ' ') // Лишние пробелы
-            .trim();
-        
-        // Делаем первую букву заглавной
-        if (improved.length > 0) {
-            improved = improved.charAt(0).toUpperCase() + improved.slice(1);
-        }
-        
-        // Добавляем точку в конце, если нужно
-        if (improved.length > 0 && !improved.match(/[.!?]$/)) {
-            improved += '.';
-        }
-        
-        return improved;
-    }
-
-    // ГЛАВНАЯ ФУНКЦИЯ УЛУЧШЕНИЯ (использует все три подхода)
-    function enhanceWithComboAI(text) {
+    function correctText(text) {
         if (!text || text === 'Начните собирать ответ...') return text;
         
-        let enhanced = text;
+        let corrected = text;
         
-        // Шаг 1: Эмпатия
-        enhanced = improveWithEmpathy(enhanced);
+        // 1. Исправляем пробелы перед знаками препинания
+        corrected = corrected.replace(/\s+([,.!?:;])/g, '$1');
         
-        // Шаг 2: N-граммы
-        enhanced = improveWithNGram(enhanced);
+        // 2. Добавляем пробелы после знаков препинания (если нужно)
+        corrected = corrected.replace(/([,.!?:;])([а-яa-z])/g, '$1 $2');
         
-        // Шаг 3: Русские правила
-        enhanced = improveWithRussianRules(enhanced);
+        // 3. Убираем лишние пробелы
+        corrected = corrected.replace(/\s+/g, ' ');
         
-        return enhanced;
+        // 4. Исправляем кавычки на «елочки»
+        corrected = corrected.replace(/"([^"]*)"/g, '«$1»');
+        
+        // 5. Исправляем дефисы на тире где нужно
+        corrected = corrected.replace(/\s-([^\s])/g, ' — $1');
+        corrected = corrected.replace(/([а-яa-z])-([а-яa-z])/g, '$1-$2'); // оставляем дефисы в словах
+        
+        // 6. Троеточие
+        corrected = corrected.replace(/\.{3,}/g, '…');
+        
+        // 7. Первая буква заглавная
+        if (corrected.length > 0) {
+            corrected = corrected.charAt(0).toUpperCase() + corrected.slice(1);
+        }
+        
+        // 8. Точка в конце, если нужно
+        if (corrected.length > 0 && !corrected.match(/[.!?…]$/)) {
+            corrected += '.';
+        }
+        
+        return corrected;
     }
 
     // Состояние
@@ -407,10 +319,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let fullResponse = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
         
-        // Применяем комбинированный ИИ, если включен
+        // Применяем корректор, если включен
         const aiToggle = document.getElementById('ai-toggle');
         if (aiToggle && aiToggle.checked) {
-            fullResponse = enhanceWithComboAI(fullResponse);
+            fullResponse = correctText(fullResponse);
         }
         
         resultBox.textContent = fullResponse;
@@ -430,8 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(() => alert('Не удалось скопировать'));
     }
 
-    // Функция для улучшения текста в ручном сборе
-    function improveStepAnswer() {
+    // Функция для коррекции текста в ручном сборе
+    function correctStepAnswer() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
         
@@ -445,16 +357,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const wasEditing = answerBox._isEditing;
         answerBox._isEditing = false;
         
-        // Улучшаем текст
-        const improved = enhanceWithComboAI(currentText);
-        answerBox.value = improved;
+        // Корректируем текст
+        const corrected = correctText(currentText);
+        answerBox.value = corrected;
         
         // Визуальный фидбек
-        const improveBtn = document.getElementById('step-ai-improve-btn');
-        const originalText = improveBtn.textContent;
-        improveBtn.innerHTML = '<span>✨</span> Текст улучшен!';
+        const correctBtn = document.getElementById('step-ai-improve-btn');
+        const originalText = correctBtn.textContent;
+        correctBtn.innerHTML = '<span>✓</span> Текст исправлен!';
         setTimeout(() => {
-            improveBtn.innerHTML = '<span>✨</span> Улучшить текст с ИИ';
+            correctBtn.innerHTML = '<span>📝</span> Исправить текст';
         }, 2000);
         
         // Восстанавливаем состояние редактирования
@@ -472,8 +384,8 @@ document.addEventListener('DOMContentLoaded', function() {
         copyText(document.getElementById('result-box').textContent, this);
     });
     
-    // Новая кнопка для улучшения в ручном сборе
-    document.getElementById('step-ai-improve-btn')?.addEventListener('click', improveStepAnswer);
+    // Кнопка исправления в ручном сборе
+    document.getElementById('step-ai-improve-btn')?.addEventListener('click', correctStepAnswer);
     
     document.getElementById('step-copy-btn')?.addEventListener('click', function() {
         copyText(document.getElementById('step-answer-box').value, this);
@@ -517,9 +429,9 @@ document.addEventListener('DOMContentLoaded', function() {
         slider.addEventListener('input', () => valSpan.textContent = slider.value);
     }
 
-    // Статус ИИ
+    // Статус корректора
     const aiStatus = document.getElementById('ai-status');
-    if (aiStatus) aiStatus.textContent = '✅ Комбинированный ИИ готов!';
+    if (aiStatus) aiStatus.textContent = '📝 Корректор текста готов';
     
     // Старт
     goToStep(1);
