@@ -130,40 +130,36 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ========== ВАЖНО: Прямое соответствие шагов и колонок ==========
-        // Шаг 1 → колонка 1 (Начинаем диалог)
-        // Шаг 2 → колонка 2 (Понимание)
-        // Шаг 3 → колонка 3 (Продолжаем диалог)
+        // СООТВЕТСТВИЕ ШАГОВ И КОЛОНОК:
+        // Шаг 1 → колонка 1 (Начинаем диалог) → id="step-col1-phrases"
+        // Шаг 2 → колонка 2 (Понимание) → id="step-col2-phrases"
+        // Шаг 3 → колонка 3 (Продолжаем диалог) → id="step-col3-phrases"
         // Шаг 4 → текстовое поле (пропускаем)
-        // Шаг 5 → колонка 4 (Извинения) - ЭТОТ ДОЛЖЕН РАБОТАТЬ!
-        // Шаг 6 → колонка 5 (Активная работа)
-        // Шаг 7 → колонка 6 (Завершение)
+        // Шаг 5 → колонка 4 (Извинения) → id="step-col4-phrases" ← ЭТО ВАЖНО!
+        // Шаг 6 → колонка 5 (Активная работа) → id="step-col5-phrases"
+        // Шаг 7 → колонка 6 (Завершение) → id="step-col6-phrases"
 
-        // Создаем кнопки для шага 1 (колонка 1)
-        createStepButtons(1, 1);
-        // Создаем кнопки для шага 2 (колонка 2)
-        createStepButtons(2, 2);
-        // Создаем кнопки для шага 3 (колонка 3)
-        createStepButtons(3, 3);
-        // Создаем кнопки для шага 5 (колонка 4) - ВАЖНО!
-        createStepButtons(5, 4);
-        // Создаем кнопки для шага 6 (колонка 5)
-        createStepButtons(6, 5);
-        // Создаем кнопки для шага 7 (колонка 6)
-        createStepButtons(7, 6);
+        // Создаем кнопки для каждого шага
+        createButtonsForStep(1, 1); // шаг 1, колонка 1
+        createButtonsForStep(2, 2); // шаг 2, колонка 2
+        createButtonsForStep(3, 3); // шаг 3, колонка 3
+        createButtonsForStep(5, 4); // шаг 5, колонка 4 (ИЗВИНЕНИЯ)
+        createButtonsForStep(6, 5); // шаг 6, колонка 5
+        createButtonsForStep(7, 6); // шаг 7, колонка 6
     }
 
-    // Функция для создания кнопок для конкретного шага
-    function createStepButtons(stepNumber, columnNumber) {
-        const container = document.getElementById(`step-col${columnNumber}-phrases`);
+    function createButtonsForStep(stepNumber, columnNumber) {
+        const containerId = `step-col${columnNumber}-phrases`;
+        const container = document.getElementById(containerId);
+        
         if (!container) {
-            console.error(`Контейнер step-col${columnNumber}-phrases не найден!`);
+            console.error(`❌ Контейнер ${containerId} не найден! Проверьте HTML.`);
             return;
         }
         
         const phraseArray = phrases[`col${columnNumber}`];
         if (!phraseArray) {
-            console.error(`Массив фраз col${columnNumber} не найден!`);
+            console.error(`❌ Массив фраз col${columnNumber} не найден!`);
             return;
         }
 
@@ -173,20 +169,20 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'step-phrase-btn';
             btn.textContent = phrase;
             
-            // Создаем замыкание с правильными значениями
-            btn.onclick = (function(step, col, text) {
+            // Создаем обработчик с правильными значениями
+            btn.onclick = (function(s, c, text) {
                 return function() {
                     // Убираем выделение у всех кнопок в этом контейнере
-                    document.querySelectorAll(`#step-col${col}-phrases .step-phrase-btn`).forEach(b => {
+                    document.querySelectorAll(`#step-col${c}-phrases .step-phrase-btn`).forEach(b => {
                         b.classList.remove('selected');
                     });
                     
                     // Выделяем текущую кнопку
                     this.classList.add('selected');
                     
-                    // Сохраняем фразу в состояние (индекс = step-1)
-                    stepState.answers[step - 1] = text;
-                    console.log(`Шаг ${step} (колонка ${col}) выбрана фраза: ${text}`);
+                    // Сохраняем фразу (индекс = шаг - 1)
+                    stepState.answers[s - 1] = text;
+                    console.log(`✅ Шаг ${s} (колонка ${c}) выбрано: "${text.substring(0, 30)}..."`);
                     
                     // Обновляем поле ответа
                     updateAnswerBox();
@@ -195,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             container.appendChild(btn);
         });
-        console.log(`Шаг ${stepNumber} (колонка ${columnNumber}) создано ${phraseArray.length} кнопок`);
+        console.log(`✅ Шаг ${stepNumber} (колонка ${columnNumber}) создано ${phraseArray.length} кнопок в ${containerId}`);
     }
 
     // Обновление поля ответа
@@ -203,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
         
-        // Собираем все непустые ответы
+        // Собираем все непустые ответы в порядке шагов
         const parts = [];
         for (let i = 0; i < stepState.answers.length; i++) {
             if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
@@ -227,7 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const current = document.getElementById(`step-${step}`);
-        if (current) current.style.display = 'block';
+        if (current) {
+            current.style.display = 'block';
+            console.log(`Переключено на шаг ${step}`);
+        } else {
+            console.error(`Панель шага ${step} не найдена!`);
+        }
 
         // Обновляем индикатор
         document.querySelectorAll('.step-item').forEach((item, index) => {
@@ -266,6 +267,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const answerBox = document.getElementById('step-answer-box');
         if (answerBox) answerBox.value = 'Начните собирать ответ...';
+        
+        goToStep(1);
     }
 
     // Переключение режимов
@@ -280,7 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (randomBtn) randomBtn.classList.toggle('active', mode === 'random');
         if (stepBtn) stepBtn.classList.toggle('active', mode === 'step');
         
-        if (mode === 'step') resetStepMode();
+        if (mode === 'step') {
+            resetStepMode();
+        }
     }
 
     // Рандомная генерация
