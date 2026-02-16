@@ -267,23 +267,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Заполняем списки фраз в правой колонке - ВАЖНО!
-    function populatePhraseLists() {
-        console.log('Заполняю списки фраз...'); // для отладки
-        
-        for (let i = 1; i <= 6; i++) {
-            const list = document.getElementById(`col${i}-phrases`);
-            if (list && phrases[`col${i}`]) {
-                // Показываем ВСЕ фразы, не только первые 5
-                list.innerHTML = phrases[`col${i}`].map(phrase => 
-                    `<li>${phrase}</li>`
-                ).join('');
+    // Заполняем списки фраз в правой колонке - ИСПРАВЛЕННАЯ ВЕРСИЯ
+function populatePhraseLists() {
+    console.log('Заполняю списки фраз...'); // для отладки
+    
+    for (let i = 1; i <= 6; i++) {
+        const list = document.getElementById(`col${i}-phrases`);
+        if (list) {
+            if (phrases[`col${i}`]) {
+                // Очищаем список
+                list.innerHTML = '';
+                // Добавляем все фразы
+                phrases[`col${i}`].forEach(phrase => {
+                    const li = document.createElement('li');
+                    li.textContent = phrase;
+                    list.appendChild(li);
+                });
                 console.log(`Колонка ${i}: добавлено ${phrases[`col${i}`].length} фраз`);
             } else {
-                console.log(`Колонка ${i} не найдена или нет фраз`);
+                console.log(`Колонка ${i}: нет фраз в массиве`);
+                list.innerHTML = '<li class="error">Ошибка загрузки фраз</li>';
             }
+        } else {
+            console.log(`Колонка ${i}: элемент не найден на странице`);
         }
     }
+}
 
     // Загружаем ИИ модель при старте
     loadAIModel();
