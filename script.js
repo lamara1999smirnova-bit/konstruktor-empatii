@@ -106,6 +106,133 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
+    // ========== КОМБИНИРОВАННЫЙ ИИ ==========
+    
+    // 1. Эмпатичный шаблонизатор
+    const empathyRules = {
+        позитивный: {
+            приветствие: ["Рад(а) помочь!", "С удовольствием отвечу!", "Всегда рады помочь!"],
+            поддержка: ["Отлично!", "Замечательно!", "Прекрасно, что обратились!"],
+            завершение: ["Хорошего дня!", "Рад(а) был(а) полезен(на)!", "Обращайтесь ещё!"]
+        },
+        нейтральный: {
+            приветствие: ["Здравствуйте!", "Добрый день!", "Рады приветствовать!"],
+            поддержка: ["Давайте разберёмся!", "Сейчас всё объясню!", "Вот что нужно сделать:"],
+            завершение: ["Всего доброго!", "Удачи в решении!", "Будем на связи!"]
+        },
+        негативный: {
+            приветствие: ["Понимаю ваше беспокойство", "Мне жаль это слышать", "Спасибо, что сообщили"],
+            поддержка: ["Обязательно поможем!", "Разберёмся в ситуации!", "Всё исправим!"],
+            завершение: ["Надеюсь, ситуация прояснилась", "Буду рядом, если нужна помощь", "Обращайтесь в любой момент"]
+        }
+    };
+
+    // 2. N-граммный анализатор
+    const wordPairs = {
+        'спасибо': ['пожалуйста', 'обращайтесь', 'рады'],
+        'извините': ['понимаем', 'ситуацию', 'исправим'],
+        'помочь': ['всегда', 'рады', 'готовы'],
+        'вопрос': ['ответить', 'уточнить', 'объяснить'],
+        'проблема': ['решить', 'разобраться', 'устранить'],
+        'помощь': ['нужна', 'понадобится', 'обращайтесь'],
+        'ответ': ['полный', 'подробный', 'развёрнутый'],
+        'решение': ['нашли', 'предложили', 'подобрали']
+    };
+
+    function analyzeTone(text) {
+        const words = text.toLowerCase();
+        if (words.includes('извин') || words.includes('простит') || 
+            words.includes('проблем') || words.includes('ошибк')) {
+            return 'негативный';
+        }
+        if (words.includes('спасиб') || words.includes('отличн') || 
+            words.includes('здоров')) {
+            return 'позитивный';
+        }
+        return 'нейтральный';
+    }
+
+    function improveWithEmpathy(text) {
+        const tone = analyzeTone(text);
+        const rule = empathyRules[tone];
+        
+        // Добавляем эмпатичные фразы в начало и конец, если их там нет
+        let improved = text;
+        
+        const hasGreeting = rule.приветствие.some(g => text.includes(g));
+        if (!hasGreeting && Math.random() > 0.5) {
+            improved = rule.приветствие[Math.floor(Math.random() * rule.приветствие.length)] + ' ' + improved;
+        }
+        
+        const hasClosing = rule.завершение.some(c => text.includes(c));
+        if (!hasClosing && Math.random() > 0.5) {
+            improved = improved + ' ' + rule.завершение[Math.floor(Math.random() * rule.завершение.length)];
+        }
+        
+        return improved;
+    }
+
+    function improveWithNGram(text) {
+        let words = text.split(' ');
+        let enhanced = [];
+        
+        for (let i = 0; i < words.length; i++) {
+            enhanced.push(words[i]);
+            
+            // Добавляем связанные слова с небольшой вероятностью
+            const cleanWord = words[i].toLowerCase().replace(/[.,!?]/g, '');
+            if (wordPairs[cleanWord] && Math.random() > 0.7) {
+                const suggestions = wordPairs[cleanWord];
+                const next = suggestions[Math.floor(Math.random() * suggestions.length)];
+                enhanced.push(next);
+            }
+        }
+        
+        return enhanced.join(' ');
+    }
+
+    function improveWithRussianRules(text) {
+        let improved = text;
+        
+        // Исправляем типографику
+        improved = improved
+            .replace(/\s+([,.!?:;])/g, '$1') // Убираем пробелы перед знаками
+            .replace(/([,.!?:;])([а-яa-z])/g, '$1 $2') // Добавляем пробелы после знаков
+            .replace(/\.\.+/g, '…') // Троеточие
+            .replace(/\s+/g, ' ') // Лишние пробелы
+            .trim();
+        
+        // Делаем первую букву заглавной
+        if (improved.length > 0) {
+            improved = improved.charAt(0).toUpperCase() + improved.slice(1);
+        }
+        
+        // Добавляем точку в конце, если нужно
+        if (improved.length > 0 && !improved.match(/[.!?]$/)) {
+            improved += '.';
+        }
+        
+        return improved;
+    }
+
+    // ГЛАВНАЯ ФУНКЦИЯ УЛУЧШЕНИЯ (использует все три подхода)
+    function enhanceWithComboAI(text) {
+        if (!text || text === 'Начните собирать ответ...') return text;
+        
+        let enhanced = text;
+        
+        // Шаг 1: Эмпатия
+        enhanced = improveWithEmpathy(enhanced);
+        
+        // Шаг 2: N-граммы
+        enhanced = improveWithNGram(enhanced);
+        
+        // Шаг 3: Русские правила
+        enhanced = improveWithRussianRules(enhanced);
+        
+        return enhanced;
+    }
+
     // Состояние
     let stepState = {
         currentStep: 1,
@@ -130,22 +257,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // СООТВЕТСТВИЕ ШАГОВ И КОЛОНОК:
-        // Шаг 1 → колонка 1 (Начинаем диалог) → id="step-col1-phrases"
-        // Шаг 2 → колонка 2 (Понимание) → id="step-col2-phrases"
-        // Шаг 3 → колонка 3 (Продолжаем диалог) → id="step-col3-phrases"
-        // Шаг 4 → текстовое поле (пропускаем)
-        // Шаг 5 → колонка 4 (Извинения) → id="step-col4-phrases" ← ЭТО ВАЖНО!
-        // Шаг 6 → колонка 5 (Активная работа) → id="step-col5-phrases"
-        // Шаг 7 → колонка 6 (Завершение) → id="step-col6-phrases"
-
-        // Создаем кнопки для каждого шага
-        createButtonsForStep(1, 1); // шаг 1, колонка 1
-        createButtonsForStep(2, 2); // шаг 2, колонка 2
-        createButtonsForStep(3, 3); // шаг 3, колонка 3
-        createButtonsForStep(5, 4); // шаг 5, колонка 4 (ИЗВИНЕНИЯ)
-        createButtonsForStep(6, 5); // шаг 6, колонка 5
-        createButtonsForStep(7, 6); // шаг 7, колонка 6
+        // Создаем кнопки для шагов
+        createButtonsForStep(1, 1);
+        createButtonsForStep(2, 2);
+        createButtonsForStep(3, 3);
+        createButtonsForStep(5, 4);
+        createButtonsForStep(6, 5);
+        createButtonsForStep(7, 6);
     }
 
     function createButtonsForStep(stepNumber, columnNumber) {
@@ -153,15 +271,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById(containerId);
         
         if (!container) {
-            console.error(`❌ Контейнер ${containerId} не найден! Проверьте HTML.`);
+            console.error(`❌ Контейнер ${containerId} не найден!`);
             return;
         }
         
         const phraseArray = phrases[`col${columnNumber}`];
-        if (!phraseArray) {
-            console.error(`❌ Массив фраз col${columnNumber} не найден!`);
-            return;
-        }
+        if (!phraseArray) return;
 
         container.innerHTML = '';
         phraseArray.forEach(phrase => {
@@ -169,29 +284,20 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'step-phrase-btn';
             btn.textContent = phrase;
             
-            // Создаем обработчик с правильными значениями
             btn.onclick = (function(s, c, text) {
                 return function() {
-                    // Убираем выделение у всех кнопок в этом контейнере
                     document.querySelectorAll(`#step-col${c}-phrases .step-phrase-btn`).forEach(b => {
                         b.classList.remove('selected');
                     });
                     
-                    // Выделяем текущую кнопку
                     this.classList.add('selected');
-                    
-                    // Сохраняем фразу (индекс = шаг - 1)
                     stepState.answers[s - 1] = text;
-                    console.log(`✅ Шаг ${s} (колонка ${c}) выбрано: "${text.substring(0, 30)}..."`);
-                    
-                    // Обновляем поле ответа
                     updateAnswerBox();
                 };
             })(stepNumber, columnNumber, phrase);
             
             container.appendChild(btn);
         });
-        console.log(`✅ Шаг ${stepNumber} (колонка ${columnNumber}) создано ${phraseArray.length} кнопок в ${containerId}`);
     }
 
     // Обновление поля ответа
@@ -199,7 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const answerBox = document.getElementById('step-answer-box');
         if (!answerBox) return;
         
-        // Собираем все непустые ответы в порядке шагов
         const parts = [];
         for (let i = 0; i < stepState.answers.length; i++) {
             if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
@@ -209,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const text = parts.join(' ') || 'Начните собирать ответ...';
         
-        // Обновляем поле, если оно не в режиме редактирования
         if (!answerBox._isEditing) {
             answerBox.value = text;
         }
@@ -223,14 +327,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const current = document.getElementById(`step-${step}`);
-        if (current) {
-            current.style.display = 'block';
-            console.log(`Переключено на шаг ${step}`);
-        } else {
-            console.error(`Панель шага ${step} не найдена!`);
-        }
+        if (current) current.style.display = 'block';
 
-        // Обновляем индикатор
         document.querySelectorAll('.step-item').forEach((item, index) => {
             const num = index + 1;
             item.classList.remove('active', 'completed');
@@ -252,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
             totalSteps: 7
         };
 
-        // Снимаем выделение
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
             if (container) {
@@ -283,9 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (randomBtn) randomBtn.classList.toggle('active', mode === 'random');
         if (stepBtn) stepBtn.classList.toggle('active', mode === 'step');
         
-        if (mode === 'step') {
-            resetStepMode();
-        }
+        if (mode === 'step') resetStepMode();
     }
 
     // Рандомная генерация
@@ -310,7 +405,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const p5 = getRandomPhrase('col5');
         const p6 = getRandomPhrase('col6');
         
-        resultBox.textContent = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
+        let fullResponse = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
+        
+        // Применяем комбинированный ИИ, если включен
+        const aiToggle = document.getElementById('ai-toggle');
+        if (aiToggle && aiToggle.checked) {
+            fullResponse = enhanceWithComboAI(fullResponse);
+        }
+        
+        resultBox.textContent = fullResponse;
     }
 
     // Копирование
@@ -327,6 +430,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(() => alert('Не удалось скопировать'));
     }
 
+    // Функция для улучшения текста в ручном сборе
+    function improveStepAnswer() {
+        const answerBox = document.getElementById('step-answer-box');
+        if (!answerBox) return;
+        
+        const currentText = answerBox.value;
+        if (!currentText || currentText === 'Начните собирать ответ...') {
+            alert('Сначала соберите ответ');
+            return;
+        }
+        
+        // Сохраняем текущее состояние редактирования
+        const wasEditing = answerBox._isEditing;
+        answerBox._isEditing = false;
+        
+        // Улучшаем текст
+        const improved = enhanceWithComboAI(currentText);
+        answerBox.value = improved;
+        
+        // Визуальный фидбек
+        const improveBtn = document.getElementById('step-ai-improve-btn');
+        const originalText = improveBtn.textContent;
+        improveBtn.innerHTML = '<span>✨</span> Текст улучшен!';
+        setTimeout(() => {
+            improveBtn.innerHTML = '<span>✨</span> Улучшить текст с ИИ';
+        }, 2000);
+        
+        // Восстанавливаем состояние редактирования
+        answerBox._isEditing = wasEditing;
+    }
+
     // Инициализация
     fillAllPhraseLists();
 
@@ -337,6 +471,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('copy-btn')?.addEventListener('click', function() {
         copyText(document.getElementById('result-box').textContent, this);
     });
+    
+    // Новая кнопка для улучшения в ручном сборе
+    document.getElementById('step-ai-improve-btn')?.addEventListener('click', improveStepAnswer);
+    
     document.getElementById('step-copy-btn')?.addEventListener('click', function() {
         copyText(document.getElementById('step-answer-box').value, this);
     });
@@ -366,10 +504,9 @@ document.addEventListener('DOMContentLoaded', function() {
         answerBox.addEventListener('focus', () => answerBox._isEditing = true);
         answerBox.addEventListener('blur', () => {
             answerBox._isEditing = false;
-            stepState.answers[7] = answerBox.value;
         });
         answerBox.addEventListener('input', () => {
-            stepState.answers[7] = answerBox.value;
+            // Ничего не делаем, просто позволяем редактировать
         });
     }
 
@@ -382,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Статус ИИ
     const aiStatus = document.getElementById('ai-status');
-    if (aiStatus) aiStatus.textContent = '✅ ИИ модель готова!';
+    if (aiStatus) aiStatus.textContent = '✅ Комбинированный ИИ готов!';
     
     // Старт
     goToStep(1);
