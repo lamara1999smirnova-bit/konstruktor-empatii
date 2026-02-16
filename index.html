@@ -212,17 +212,24 @@
                         <div class="step-phrases" id="step-col6-phrases"></div>
                     </div>
 
-                    <!-- Блок собираемого ответа - ТЕПЕРЬ РЕДАКТИРУЕМЫЙ! -->
-                    <div class="step-answer">
-                        <h3>📝 Собираемый ответ (можно редактировать):</h3>
-                        <textarea 
-                            id="step-answer-box" 
-                            class="step-textarea" 
-                            placeholder="Начните собирать ответ..." 
-                            rows="5"
-                        >Начните собирать ответ...</textarea>
-                        <button id="step-copy-btn" class="copy-btn">📋 Копировать ответ</button>
-                    </div>
+                    <!-- Блок собираемого ответа -->
+<div class="step-answer">
+    <h3>📝 Собираемый ответ (можно редактировать):</h3>
+    <textarea 
+        id="step-answer-box" 
+        class="step-textarea" 
+        placeholder="Начните собирать ответ..." 
+        rows="5"
+    >Начните собирать ответ...</textarea>
+    
+    <!-- КНОПКА УЛУЧШЕНИЯ ТЕКСТА -->
+    <button id="step-ai-improve-btn" class="ai-improve-btn">
+        <span>✨</span>
+        Улучшить текст с ИИ
+    </button>
+    
+    <button id="step-copy-btn" class="copy-btn">📋 Копировать ответ</button>
+</div>
 
                     <!-- Кнопки навигации -->
                     <div class="step-navigation">
