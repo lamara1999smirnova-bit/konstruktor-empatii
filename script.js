@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // МАССИВЫ С ФРАЗАМИ - ВОССТАНАВЛИВАЕМ ПОЛНЫЕ ВЕРСИИ
+    // МАССИВЫ С ФРАЗАМИ - ВСЕ ФРАЗЫ ИЗ ДОКУМЕНТА
     const phrases = {
         col1: [
             "Спасибо, что написали.",
@@ -139,6 +139,14 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
+    // Состояние пошагового режима
+    let stepState = {
+        currentStep: 1,
+        answers: ['', '', '', '', '', '', ''],
+        selectedPhrases: {},
+        totalSteps: 7
+    };
+
     // ИИ переменные
     let model = null;
     let isModelLoading = false;
@@ -149,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         isModelLoading = true;
         const statusEl = document.getElementById('ai-status');
+        if (!statusEl) return;
         
         try {
             statusEl.textContent = '🤖 Загрузка ИИ модели (это займет немного времени)...';
@@ -156,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Создаем простую модель для улучшения текста
             model = {
                 enhance: async function(text, temperature) {
-                    // Простая имитация ИИ
                     const variations = [
                         text,
                         text + ' Будем рады помочь!',
@@ -165,10 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         'С удовольствием помогу: ' + text,
                     ];
                     
-                    // Имитируем задержку ИИ
                     await new Promise(resolve => setTimeout(resolve, 500));
                     
-                    // Выбираем случайный вариант с учетом креативности
                     const randomIndex = Math.floor(Math.random() * variations.length);
                     return variations[randomIndex];
                 }
@@ -177,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusEl.textContent = '✅ ИИ модель готова!';
         } catch (error) {
             console.error('Ошибка загрузки ИИ:', error);
-            statusEl.textContent = '⚠️ Ошибка загрузки ИИ, использую обычный режим';
+            statusEl.textContent = '⚠️ Ошибка загрузки ИИ';
             model = null;
         } finally {
             isModelLoading = false;
@@ -206,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return columnPhrases[randomIndex];
     }
 
-    // Функция для сборки ответа
+    // Функция для сборки ответа в рандомном режиме
     async function generateResponse() {
         const solution = document.getElementById('solution-text').value.trim();
         const resultBox = document.getElementById('result-box');
@@ -216,10 +222,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Показываем, что идет генерация
         resultBox.textContent = '⏳ Генерация ответа...';
 
-        // Получаем случайные фразы из каждой колонки
         const phrase1 = getRandomPhrase('col1');
         const phrase2 = getRandomPhrase('col2');
         const phrase3 = getRandomPhrase('col3');
@@ -227,57 +231,37 @@ document.addEventListener('DOMContentLoaded', function() {
         const phrase5 = getRandomPhrase('col5');
         const phrase6 = getRandomPhrase('col6');
 
-        // Собираем базовый ответ
         let fullResponse = `${phrase1} ${phrase2} ${phrase3} ${solution} ${phrase4} ${phrase5} ${phrase6}`;
-
-        // Улучшаем с помощью ИИ если нужно
         fullResponse = await enhanceWithAI(fullResponse);
 
-        // Отображаем результат
         resultBox.textContent = fullResponse;
     }
 
     // Функция для копирования в буфер обмена
-    function copyToClipboard() {
-        const resultText = document.getElementById('result-box').textContent;
-        
-        if (!resultText || resultText === '⏳ Генерация ответа...') {
-            alert('Сначала сгенерируйте ответ');
+    function copyToClipboard(text, button) {
+        if (!text || text === 'Начните собирать ответ...' || text === '⏳ Генерация ответа...') {
+            alert('Нет текста для копирования');
             return;
         }
 
-        navigator.clipboard.writeText(resultText).then(() => {
-            const copyBtn = document.getElementById('copy-btn');
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = '✅ Скопировано!';
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = button.textContent;
+            button.textContent = '✅ Скопировано!';
             setTimeout(() => {
-                copyBtn.textContent = originalText;
+                button.textContent = originalText;
             }, 2000);
         }).catch(err => {
             alert('Не удалось скопировать текст');
         });
     }
 
-    // Обновление значения слайдера
-    function updateCreativityValue() {
-        const slider = document.getElementById('creativity-slider');
-        const value = document.getElementById('creativity-value');
-        if (slider && value) {
-            value.textContent = slider.value;
-        }
-    }
-
-    // Заполняем списки фраз в правой колонке - ИСПРАВЛЕННАЯ ВЕРСИЯ
-function populatePhraseLists() {
-    console.log('Заполняю списки фраз...'); // для отладки
-    
-    for (let i = 1; i <= 6; i++) {
-        const list = document.getElementById(`col${i}-phrases`);
-        if (list) {
-            if (phrases[`col${i}`]) {
-                // Очищаем список
+    // Заполняем списки фраз в правой колонке
+    function populatePhraseLists() {
+        console.log('Заполняю списки фраз для правой панели...');
+        for (let i = 1; i <= 6; i++) {
+            const list = document.getElementById(`col${i}-phrases`);
+            if (list && phrases[`col${i}`]) {
                 list.innerHTML = '';
-                // Добавляем все фразы
                 phrases[`col${i}`].forEach(phrase => {
                     const li = document.createElement('li');
                     li.textContent = phrase;
@@ -285,281 +269,263 @@ function populatePhraseLists() {
                 });
                 console.log(`Колонка ${i}: добавлено ${phrases[`col${i}`].length} фраз`);
             } else {
-                console.log(`Колонка ${i}: нет фраз в массиве`);
-                list.innerHTML = '<li class="error">Ошибка загрузки фраз</li>';
+                console.log(`Колонка ${i}: элемент не найден или нет фраз`);
             }
-        } else {
-            console.log(`Колонка ${i}: элемент не найден на странице`);
         }
     }
-}
 
-    // Загружаем ИИ модель при старте
+    // Заполняем списки фраз для пошагового режима
+    function populateStepPhrases() {
+        console.log('Заполняю списки фраз для пошагового режима...');
+        for (let i = 1; i <= 6; i++) {
+            const container = document.getElementById(`step-col${i}-phrases`);
+            if (container && phrases[`col${i}`]) {
+                container.innerHTML = '';
+                phrases[`col${i}`].forEach(phrase => {
+                    const btn = document.createElement('button');
+                    btn.className = 'step-phrase-btn';
+                    btn.textContent = phrase;
+                    btn.setAttribute('data-step', i);
+                    btn.setAttribute('data-phrase', phrase);
+                    btn.onclick = function() { selectStepPhrase(i, phrase, this); };
+                    container.appendChild(btn);
+                });
+                console.log(`Шаг ${i}: добавлено ${phrases[`col${i}`].length} кнопок`);
+            } else {
+                console.log(`Шаг ${i}: элемент не найден или нет фраз`);
+            }
+        }
+    }
+
+    // Выбор фразы в пошаговом режиме
+    function selectStepPhrase(step, phrase, btn) {
+        // Убираем выделение у всех кнопок в этом шаге
+        const container = document.getElementById(`step-col${step}-phrases`);
+        if (container) {
+            container.querySelectorAll('.step-phrase-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
+        }
+        
+        // Выделяем выбранную кнопку
+        btn.classList.add('selected');
+        
+        // Сохраняем фразу
+        stepState.answers[step - 1] = phrase;
+        updateStepAnswer();
+    }
+
+    // Обновление собираемого ответа
+    function updateStepAnswer() {
+        const answerBox = document.getElementById('step-answer-box');
+        if (!answerBox) return;
+        
+        const fullAnswer = stepState.answers.filter(a => a && a.trim() !== '').join(' ');
+        answerBox.textContent = fullAnswer || 'Начните собирать ответ...';
+    }
+
+    // Переключение шагов
+    function goToStep(step) {
+        // Скрываем все шаги
+        for (let i = 1; i <= stepState.totalSteps; i++) {
+            const panel = document.getElementById(`step-${i}`);
+            if (panel) panel.style.display = 'none';
+        }
+        
+        // Показываем текущий шаг
+        const currentPanel = document.getElementById(`step-${step}`);
+        if (currentPanel) currentPanel.style.display = 'block';
+        
+        // Обновляем индикатор
+        document.querySelectorAll('.step-item').forEach((item, index) => {
+            const stepNum = index + 1;
+            item.classList.remove('active', 'completed');
+            
+            if (stepNum === step) {
+                item.classList.add('active');
+            } else if (stepNum < step) {
+                item.classList.add('completed');
+            }
+        });
+        
+        // Обновляем кнопки навигации
+        const prevBtn = document.getElementById('step-prev');
+        if (prevBtn) {
+            prevBtn.disabled = step === 1;
+        }
+        
+        stepState.currentStep = step;
+    }
+
+    // Сброс пошагового режима
+    function resetStepMode() {
+        stepState = {
+            currentStep: 1,
+            answers: ['', '', '', '', '', '', ''],
+            selectedPhrases: {},
+            totalSteps: 7
+        };
+        
+        // Снимаем выделение со всех кнопок
+        for (let i = 1; i <= 6; i++) {
+            const container = document.getElementById(`step-col${i}-phrases`);
+            if (container) {
+                container.querySelectorAll('.step-phrase-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+            }
+        }
+        
+        // Очищаем поле ввода
+        const stepSolution = document.getElementById('step-solution');
+        if (stepSolution) stepSolution.value = '';
+        
+        // Обновляем ответ
+        updateStepAnswer();
+        
+        // Возвращаемся к первому шагу
+        goToStep(1);
+    }
+
+    // Переключение между режимами
+    function switchMode(mode) {
+        const randomMode = document.getElementById('random-mode');
+        const stepMode = document.getElementById('step-mode');
+        const randomBtn = document.getElementById('mode-random');
+        const stepBtn = document.getElementById('mode-step');
+        
+        if (mode === 'random') {
+            randomMode.classList.add('active');
+            stepMode.classList.remove('active');
+            randomBtn.classList.add('active');
+            stepBtn.classList.remove('active');
+        } else {
+            randomMode.classList.remove('active');
+            stepMode.classList.add('active');
+            randomBtn.classList.remove('active');
+            stepBtn.classList.add('active');
+            // Сбрасываем пошаговый режим при переключении
+            resetStepMode();
+        }
+    }
+
+    // Инициализация всех обработчиков
+    function initEventListeners() {
+        // Переключатель режимов
+        const randomBtn = document.getElementById('mode-random');
+        const stepBtn = document.getElementById('mode-step');
+        
+        if (randomBtn) {
+            randomBtn.addEventListener('click', () => switchMode('random'));
+        }
+        
+        if (stepBtn) {
+            stepBtn.addEventListener('click', () => switchMode('step'));
+        }
+        
+        // Кнопки в рандомном режиме
+        const generateBtn = document.getElementById('generate-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        if (generateBtn) {
+            generateBtn.addEventListener('click', generateResponse);
+        }
+        
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                const resultText = document.getElementById('result-box').textContent;
+                copyToClipboard(resultText, this);
+            });
+        }
+        
+        // Кнопки в пошаговом режиме
+        const stepCopyBtn = document.getElementById('step-copy-btn');
+        const stepPrev = document.getElementById('step-prev');
+        const stepNext = document.getElementById('step-next');
+        const stepSkip = document.getElementById('step-skip');
+        
+        if (stepCopyBtn) {
+            stepCopyBtn.addEventListener('click', function() {
+                const answerBox = document.getElementById('step-answer-box');
+                copyToClipboard(answerBox.textContent, this);
+            });
+        }
+        
+        if (stepPrev) {
+            stepPrev.addEventListener('click', function() {
+                if (stepState.currentStep > 1) {
+                    goToStep(stepState.currentStep - 1);
+                }
+            });
+        }
+        
+        if (stepNext) {
+            stepNext.addEventListener('click', function() {
+                if (stepState.currentStep < stepState.totalSteps) {
+                    goToStep(stepState.currentStep + 1);
+                } else {
+                    alert('Вы завершили все шаги! Можете скопировать ответ.');
+                }
+            });
+        }
+        
+        if (stepSkip) {
+            stepSkip.addEventListener('click', function() {
+                if (stepState.currentStep < stepState.totalSteps) {
+                    goToStep(stepState.currentStep + 1);
+                }
+            });
+        }
+        
+        // Отслеживаем изменение в поле ввода 4-го шага
+        const stepSolution = document.getElementById('step-solution');
+        if (stepSolution) {
+            stepSolution.addEventListener('input', function() {
+                stepState.answers[3] = this.value;
+                updateStepAnswer();
+            });
+        }
+        
+        // Слайдер креативности
+        const creativitySlider = document.getElementById('creativity-slider');
+        const creativityValue = document.getElementById('creativity-value');
+        
+        if (creativitySlider && creativityValue) {
+            creativitySlider.addEventListener('input', function() {
+                creativityValue.textContent = this.value;
+            });
+        }
+    }
+
+    // Запуск при загрузке страницы
+    console.log('Скрипт загружен, начинаю инициализацию...');
+    
+    // Загружаем ИИ модель
     loadAIModel();
     
-    // Заполняем списки фраз - это вернет все фразы!
+    // Заполняем списки фраз
     populatePhraseLists();
-
-    // Навешиваем обработчики
-    const generateBtn = document.getElementById('generate-btn');
-    const copyBtn = document.getElementById('copy-btn');
-    const creativitySlider = document.getElementById('creativity-slider');
+    populateStepPhrases();
     
-    if (generateBtn) generateBtn.addEventListener('click', generateResponse);
-    if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
+    // Инициализируем обработчики
+    initEventListeners();
     
-    // Слайдер креативности
-    if (creativitySlider) {
-        creativitySlider.addEventListener('input', updateCreativityValue);
-        updateCreativityValue();
-    }
-
-    // Генерируем первый ответ при загрузке
-    setTimeout(() => {
-        if (document.getElementById('solution-text').value.trim()) {
-            generateResponse();
-        }
-    }, 1000);
+    // Устанавливаем первый шаг
+    goToStep(1);
+    
+    // Обновляем ответ
+    updateStepAnswer();
+    
+    console.log('Инициализация завершена');
 });
-/* Переключатель режимов */
-.mode-switcher {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin: 30px 0;
-}
 
-.mode-btn {
-    padding: 12px 30px;
-    font-size: 1.1rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 50px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.mode-btn.active {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: white;
-    border-color: transparent;
-}
-
-.mode-content {
-    display: none;
-}
-
-.mode-content.active {
-    display: block;
-}
-
-/* Пошаговый режим */
-.step-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 30px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-}
-
-.step-indicator {
-    margin-bottom: 30px;
-}
-
-.step-progress {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-}
-
-.step-progress::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #e2e8f0;
-    transform: translateY(-50%);
-    z-index: 1;
-}
-
-.step-item {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: white;
-    border: 2px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    position: relative;
-    z-index: 2;
-    transition: all 0.3s;
-}
-
-.step-item.active {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: white;
-}
-
-.step-item.completed {
-    background: #10b981;
-    border-color: #10b981;
-    color: white;
-}
-
-.step-content {
-    margin-top: 30px;
-}
-
-.step-panel {
-    animation: fadeIn 0.5s;
-}
-
-.step-hint {
-    color: #64748b;
-    margin-bottom: 20px;
-}
-
-.step-phrases {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 30px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-.step-phrase-btn {
-    padding: 12px;
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-    font-size: 0.95rem;
-}
-
-.step-phrase-btn:hover {
-    background: #2563eb;
-    color: white;
-    border-color: #2563eb;
-}
-
-.step-phrase-btn.selected {
-    background: #2563eb;
-    color: white;
-    border-color: #2563eb;
-}
-
-.step-textarea {
-    width: 100%;
-    padding: 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    margin-bottom: 20px;
-    resize: vertical;
-}
-
-.step-textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-}
-
-.step-answer {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 30px 0;
-}
-
-.step-answer-box {
-    min-height: 100px;
-    padding: 16px;
-    background: white;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    margin: 15px 0;
-    white-space: pre-wrap;
-    line-height: 1.6;
-}
-
-.step-navigation {
-    display: flex;
-    gap: 12px;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.step-btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex: 1;
-}
-
-.step-btn:first-child {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.step-btn:first-child:hover:not(:disabled) {
-    background: #e2e8f0;
-}
-
-.step-btn:first-child:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.step-btn:last-child {
-    background: #2563eb;
-    color: white;
-}
-
-.step-btn:last-child:hover {
-    background: #1d4ed8;
-}
-
-#step-skip {
-    background: #f59e0b;
-    color: white;
-}
-
-#step-skip:hover {
-    background: #d97706;
-}
-
-/* Анимации */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+// Дополнительная инициализация после полной загрузки страницы
+window.addEventListener('load', function() {
+    console.log('Страница полностью загружена');
+    // Проверяем, что все списки заполнены
+    if (typeof populatePhraseLists === 'function') {
+        // Не вызываем напрямую, функция не в глобальной области видимости
+        // Просто логируем
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .step-phrases {
-        grid-template-columns: 1fr;
-    }
-    
-    .step-navigation {
-        flex-direction: column;
-    }
-}
+    console.log('Все готово!');
+});
