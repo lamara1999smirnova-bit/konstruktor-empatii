@@ -13,10 +13,11 @@
             <p class="subtitle">Помогает сделать шаблонные ответы живыми и человечными</p>
         </header>
 
-        <!-- Переключатель режимов -->
+        <!-- Переключатель режимов (теперь 3 кнопки) -->
         <div class="mode-switcher">
             <button class="mode-btn active" id="mode-random">🎲 Рандомный ответ</button>
             <button class="mode-btn" id="mode-step">👣 Ручной сбор</button>
+            <button class="mode-btn" id="mode-detector">🔍 Детектор</button>
         </div>
 
         <!-- Рандомный режим -->
@@ -78,7 +79,6 @@
                             </div>
                             <ul class="phrases-list" id="col1-phrases"></ul>
                         </div>
-
                         <div class="preview-col">
                             <div class="col-header col2-header">
                                 <span class="col-number">2</span>
@@ -86,7 +86,6 @@
                             </div>
                             <ul class="phrases-list" id="col2-phrases"></ul>
                         </div>
-
                         <div class="preview-col">
                             <div class="col-header col3-header">
                                 <span class="col-number">3</span>
@@ -94,7 +93,6 @@
                             </div>
                             <ul class="phrases-list" id="col3-phrases"></ul>
                         </div>
-
                         <div class="preview-col">
                             <div class="col-header col4-header">
                                 <span class="col-number">4</span>
@@ -102,7 +100,6 @@
                             </div>
                             <ul class="phrases-list" id="col4-phrases"></ul>
                         </div>
-
                         <div class="preview-col">
                             <div class="col-header col5-header">
                                 <span class="col-number">5</span>
@@ -110,7 +107,6 @@
                             </div>
                             <ul class="phrases-list" id="col5-phrases"></ul>
                         </div>
-
                         <div class="preview-col">
                             <div class="col-header col6-header">
                                 <span class="col-number">6</span>
@@ -126,7 +122,6 @@
         <!-- Ручной сбор -->
         <div id="step-mode" class="mode-content">
             <div class="step-container">
-                <!-- Индикатор шагов -->
                 <div class="step-indicator">
                     <div class="step-progress">
                         <div class="step-item active" data-step="1">1</div>
@@ -139,7 +134,6 @@
                     </div>
                 </div>
 
-                <!-- Шаги -->
                 <div class="step-content">
                     <!-- Шаг 1 -->
                     <div id="step-1" class="step-panel">
@@ -147,42 +141,36 @@
                         <p class="step-hint">Выберите подходящую фразу для начала разговора</p>
                         <div class="step-phrases" id="step-col1-phrases"></div>
                     </div>
-
                     <!-- Шаг 2 -->
                     <div id="step-2" class="step-panel" style="display: none;">
                         <h2>Шаг 2: Понимание/сочувствие</h2>
                         <p class="step-hint">Выберите фразу, показывающую понимание проблемы</p>
                         <div class="step-phrases" id="step-col2-phrases"></div>
                     </div>
-
                     <!-- Шаг 3 -->
                     <div id="step-3" class="step-panel" style="display: none;">
                         <h2>Шаг 3: Продолжаем диалог</h2>
                         <p class="step-hint">Выберите связующую фразу</p>
                         <div class="step-phrases" id="step-col3-phrases"></div>
                     </div>
-
                     <!-- Шаг 4 -->
                     <div id="step-4" class="step-panel" style="display: none;">
                         <h2>Шаг 4: Ваш ответ с решением</h2>
                         <p class="step-hint">Введите фактуру — то, что реально поможет клиенту</p>
                         <textarea id="step-solution" class="step-textarea" placeholder="Например: нужно перезагрузить роутер и проверить подключение по Wi-Fi" rows="4"></textarea>
                     </div>
-
                     <!-- Шаг 5 -->
                     <div id="step-5" class="step-panel" style="display: none;">
                         <h2>Шаг 5: Извинения</h2>
                         <p class="step-hint">Выберите фразу для извинений (если уместно)</p>
                         <div class="step-phrases" id="step-col4-phrases"></div>
                     </div>
-
                     <!-- Шаг 6 -->
                     <div id="step-6" class="step-panel" style="display: none;">
                         <h2>Шаг 6: Активная работа</h2>
                         <p class="step-hint">Выберите фразу, показывающую, что вы решаете вопрос</p>
                         <div class="step-phrases" id="step-col5-phrases"></div>
                     </div>
-
                     <!-- Шаг 7 -->
                     <div id="step-7" class="step-panel" style="display: none;">
                         <h2>Шаг 7: Завершение</h2>
@@ -209,11 +197,52 @@
                         </div>
                     </div>
 
-                    <!-- Навигация -->
                     <div class="step-navigation">
                         <button id="step-prev" class="step-btn" disabled>◀ Назад</button>
                         <button id="step-skip" class="step-btn">⏭ Пропустить шаг</button>
                         <button id="step-next" class="step-btn">Далее ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- НОВЫЙ РЕЖИМ: Детектор канцеляризмов -->
+        <div id="detector-mode" class="mode-content">
+            <div class="detector-container">
+                <h2>🔍 Детектор канцеляризмов и стоп-слов</h2>
+                <p class="detector-description">
+                    Канцеляризмы — слова и обороты формального делового стиля, англицизмы и технический сленг. 
+                    Придают речи формальность. Упрощаем и расшифровываем.<br>
+                    Стоп-слова — мусор без чёткого значения. Заменяем или убираем.<br>
+                    <strong>Редактор подсветит, где текст можно сделать чище.</strong>
+                </p>
+
+                <div class="detector-input-area">
+                    <textarea 
+                        id="detector-text" 
+                        class="detector-textarea" 
+                        placeholder="Вставьте текст для проверки..."
+                        rows="6"
+                    ></textarea>
+                    
+                    <button id="detector-btn" class="detector-btn">
+                        <span>🔍</span>
+                        Проверить текст
+                    </button>
+                </div>
+
+                <div class="detector-results">
+                    <h3>📊 Результаты проверки:</h3>
+                    <div class="detector-stats" id="detector-stats">
+                        Найдено проблем: 0
+                    </div>
+                    <div class="detector-highlighted" id="detector-highlighted">
+                        <!-- Здесь будет текст с подсветкой -->
+                    </div>
+                    
+                    <h3>💡 Рекомендации по замене:</h3>
+                    <div class="detector-suggestions" id="detector-suggestions">
+                        <!-- Здесь будут подсказки -->
                     </div>
                 </div>
             </div>
