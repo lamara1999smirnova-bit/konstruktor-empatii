@@ -141,22 +141,178 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
+    // ========== СЛОВАРЬ КАНЦЕЛЯРИЗМОВ И СТОП-СЛОВ ==========
+    const badWords = {
+        'в связи с': 'из-за',
+        'максимально': 'очень',
+        'продукт': 'подписка/услуга',
+        'beta-версия': 'бета-версия',
+        'некорректно': 'неправильно',
+        'согласно': 'смотрите',
+        'отсутствует': 'нет',
+        'находится': '',
+        'является': '',
+        'оптимизировать': 'улучшить',
+        'период времени': 'период',
+        'на вкладке': 'во вкладке',
+        'тикет': 'обращение',
+        'авторизация': 'вход',
+        'пин-код': 'ПИН-код',
+        'ежемесячно': 'каждый месяц',
+        'еженедельно': 'каждую неделю',
+        'по ссылке': 'здесь',
+        'скопировать в буфер обмена': 'скопировать',
+        'веб-ссылка': 'ссылка',
+        'иной': 'другой',
+        'функционировать': 'работать',
+        'sms': 'СМС',
+        'смс': 'СМС',
+        'аккаунт': 'профиль',
+        'лк': 'профиль',
+        'учётная запись': 'профиль',
+        'оплата по карте': 'оплата картой',
+        'вопрос по': 'вопрос о',
+        'баг': 'ошибка',
+        'нет в наличии': 'закончился',
+        'в случае': 'если',
+        'скидка -50%': 'скидка 50%',
+        'для получения': 'чтобы получить',
+        'принять решение': 'решить',
+        'повторно': 'ещё раз',
+        'почта': 'электронная почта',
+        'e-mail': 'электронная почта',
+        'пункт вывоза': 'пункт выдачи',
+        'оплатить': 'заплатить',
+        'задолженность': 'долг',
+        'корректный': 'правильный',
+        'транзакция': 'платёж',
+        'биометрия': 'вход по лицу',
+        'авторизация': 'вход',
+        'селлер': 'продавец',
+        'поставщик': 'продавец',
+        'клиент': 'покупатель',
+        'функционал': 'возможности',
+        'фича': 'функция',
+        'далее': 'дальше',
+        'ранее': 'раньше',
+        'менее': 'меньше',
+        'удержание': 'штраф',
+        'успешно': '',
+        'брак': 'дефект',
+        'данный': 'этот',
+        'данная': 'эта',
+        'данные': 'эти',
+        'в ближайшем будущем': 'скоро',
+        'в настоящее время': 'сейчас',
+        'денежные средства': 'деньги',
+        'время от времени': 'иногда',
+        'во избежание': 'чтобы',
+        'при наличии': 'если есть',
+        'нет необходимости': 'не нужно',
+        'необходимо': 'нужно',
+        'нет возможности': 'нельзя',
+        'по причине': 'потому что',
+        'помимо': 'также',
+        'таким образом': 'так',
+        'текущий': 'этот',
+        'однако': 'но',
+        'осуществить': 'сделать',
+        'имеет смысл': 'можно',
+        'просим вас': 'пожалуйста'
+    };
+
+    const stopWords = new Set([
+        'просто', 'конкретно', 'реально', 'вообще', 'типа', 'как бы', 'ну', 'вот',
+        'же', 'бы', 'ли', 'ведь', 'даже', 'уж', 'ещё', 'почти', 'вроде', 'якобы',
+        'мол', 'практически', 'фактически', 'буквально', 'собственно'
+    ]);
+
     // ========== ПРОСТОЙ КОРРЕКТОР ==========
     function correctText(text) {
         if (!text || text === 'Начните собирать ответ...') return text;
         
         let corrected = text;
-        
-        // Убираем лишние пробелы
         corrected = corrected.replace(/\s+/g, ' ');
         corrected = corrected.trim();
         
-        // Точка в конце
         if (corrected.length > 0 && !corrected.match(/[.!?]$/)) {
             corrected += '.';
         }
         
         return corrected;
+    }
+
+    // ========== ДЕТЕКТОР ==========
+    function detectIssues(text) {
+        if (!text.trim()) return { issues: [], suggestions: [] };
+        
+        const words = text.toLowerCase().split(/(\s+|[.,!?;:])/);
+        const issues = [];
+        const suggestions = [];
+        const foundWords = new Set();
+        
+        // Поиск канцеляризмов
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i].toLowerCase().trim();
+            if (!word || word.length < 2) continue;
+            
+            // Проверяем точное совпадение
+            if (badWords[word] && !foundWords.has(word)) {
+                foundWords.add(word);
+                issues.push({
+                    word: word,
+                    type: 'Канцеляризм',
+                    replacement: badWords[word],
+                    index: i
+                });
+            }
+            
+            // Проверяем вхождение в составные фразы
+            for (let j = i; j < Math.min(i + 3, words.length); j++) {
+                const phrase = words.slice(i, j + 1).join(' ').toLowerCase().trim();
+                if (badWords[phrase] && !foundWords.has(phrase)) {
+                    foundWords.add(phrase);
+                    issues.push({
+                        word: phrase,
+                        type: 'Канцеляризм',
+                        replacement: badWords[phrase],
+                        index: i
+                    });
+                }
+            }
+            
+            // Проверяем стоп-слова
+            if (stopWords.has(word) && !foundWords.has(word)) {
+                foundWords.add(word);
+                issues.push({
+                    word: word,
+                    type: 'Стоп-слово',
+                    replacement: 'удалить',
+                    index: i
+                });
+            }
+        }
+        
+        // Создаем подсветку текста
+        let highlighted = text;
+        issues.forEach(issue => {
+            const regex = new RegExp(`(${issue.word})`, 'gi');
+            const className = issue.type === 'Канцеляризм' ? 'highlight-bad' : 'highlight-stop';
+            highlighted = highlighted.replace(regex, `<span class="${className}" title="${issue.type}: замените на '${issue.replacement}'">$1</span>`);
+        });
+        
+        // Создаем рекомендации
+        const suggestionsList = issues.map(issue => ({
+            original: issue.word,
+            replacement: issue.replacement,
+            type: issue.type
+        }));
+        
+        return {
+            issues: issues,
+            suggestions: suggestionsList,
+            highlighted: highlighted
+        };
     }
 
     // ========== СОСТОЯНИЕ ==========
@@ -180,14 +336,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     li.textContent = phrase;
                     list.appendChild(li);
                 });
-                console.log(`Колонка ${i}: ${phrases[`col${i}`].length} фраз`);
             }
         }
 
         // Кнопки для шагов
-        const stepCols = {
-            1: 1, 2: 2, 3: 3, 5: 4, 6: 5, 7: 6
-        };
+        const stepCols = { 1: 1, 2: 2, 3: 3, 5: 4, 6: 5, 7: 6 };
         
         for (let step = 1; step <= 7; step++) {
             if (step === 4) continue;
@@ -204,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     btn.onclick = (function(s, text) {
                         return function() {
-                            // Убираем выделение
                             document.querySelectorAll(`#step-col${col}-phrases .step-phrase-btn`).forEach(b => {
                                 b.classList.remove('selected');
                             });
@@ -217,7 +369,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     container.appendChild(btn);
                 });
-                console.log(`Шаг ${step} готов`);
             }
         }
     }
@@ -241,7 +392,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const current = document.getElementById(`step-${step}`);
         if (current) current.style.display = 'block';
 
-        // Индикатор
         document.querySelectorAll('.step-item').forEach((item, index) => {
             const num = index + 1;
             item.classList.remove('active', 'completed');
@@ -263,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function() {
             totalSteps: 7
         };
 
-        // Снимаем выделение
         for (let i = 1; i <= 6; i++) {
             const container = document.getElementById(`step-col${i}-phrases`);
             if (container) {
@@ -273,14 +422,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        document.getElementById('step-solution').value = '';
-        document.getElementById('step-answer-box').value = 'Начните собирать ответ...';
+        const stepSolution = document.getElementById('step-solution');
+        if (stepSolution) stepSolution.value = '';
+        
+        const answerBox = document.getElementById('step-answer-box');
+        if (answerBox) answerBox.value = 'Начните собирать ответ...';
+        
         goToStep(1);
     }
 
     // ========== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ==========
     function switchMode(mode) {
-        // Все режимы
         const modes = ['random-mode', 'step-mode', 'detector-mode'];
         const btns = ['mode-random', 'mode-step', 'mode-detector'];
         
@@ -294,7 +446,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (el) el.classList.remove('active');
         });
         
-        // Включаем выбранный
         const modeMap = {
             'random': ['random-mode', 'mode-random'],
             'step': ['step-mode', 'mode-step'],
@@ -404,20 +555,41 @@ document.addEventListener('DOMContentLoaded', function() {
         updateStepAnswer();
     });
 
-    // Детектор (простая версия)
+    // Детектор
     document.getElementById('detector-btn')?.addEventListener('click', function() {
         const input = document.getElementById('detector-text').value;
         const output = document.getElementById('detector-highlighted');
         const stats = document.getElementById('detector-stats');
+        const suggestionsDiv = document.getElementById('detector-suggestions');
         
         if (!input.trim()) {
             alert('Введите текст для проверки');
             return;
         }
         
-        // Просто показываем оригинальный текст
-        output.textContent = input;
-        stats.textContent = 'Найдено проблем: 0 (детектор в разработке)';
+        const result = detectIssues(input);
+        
+        // Подсветка
+        output.innerHTML = result.highlighted || input;
+        
+        // Статистика
+        stats.textContent = `Найдено проблем: ${result.issues.length}`;
+        
+        // Рекомендации
+        if (result.suggestions.length > 0) {
+            suggestionsDiv.innerHTML = result.suggestions.map(s => `
+                <div class="suggestion-item">
+                    <span class="suggestion-badge">${s.type}</span>
+                    <div class="suggestion-text">
+                        <span class="suggestion-original">${s.original}</span>
+                        → 
+                        <span class="suggestion-replace">${s.replacement || 'удалить'}</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            suggestionsDiv.innerHTML = '<p>Проблем не найдено. Текст чист!</p>';
+        }
     });
 
     // Старт
