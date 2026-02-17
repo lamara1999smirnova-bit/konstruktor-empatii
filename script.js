@@ -89,4 +89,346 @@ document.addEventListener('DOMContentLoaded', function() {
             "Надеюсь, у меня получилось помочь. Если нужно ещё что-то уточнить, напишите обязательно, я помогу.",
             "Очень надеюсь, что мне удалось вас сориентировать. Если нужны подробности или остались вопросы, пожалуйста, обращайтесь — я на связи!",
             "Обязательно напишите, если что-то пойдёт не так — я помогу!",
-            "Надею
+            "Надеюсь, сейчас всё стало понятнее. Если будут вопросы — напишите, пожалуйста.",
+            "Если что-то ещё потребуется — я на связи.", "Буду рядом, если понадобится помощь.",
+            "Если вдруг что-то останется неясным — напишите, разберёмся вместе.",
+            "Буду рад/а продолжить диалог, если появятся вопросы.",
+            "Если снова не получится — дайте знать, посмотрим ещё раз",
+            "Надеюсь, мой совет поможет вам сэкономить время",
+            "Если появятся ещё вопросы, обращайтесь.",
+            "Если у вас появятся ещё вопросы, напишите — мы на связи.",
+            "Если у вас появятся ещё вопросы, напишите — мы во всём разберёмся и подскажем, что можно сделать.",
+            "Надеюсь, у меня получилось вам помочь. Если появятся ещё вопросы, дайте знать.",
+            "Если у вас появятся ещё вопросы, обязательно напишите. Во всём разберёмся и подскажем, что нужно сделать.",
+            "Напишите, если у вас возникнут какие-либо вопросы. Вместе во всём разберёмся.",
+            "Напишите, если нужно будет помочь ещё с чем-то разобраться.",
+            "Если у вас остались ещё вопросы, дайте знать."
+        ]
+    };
+
+    // ========== КАЧЕСТВЕННЫЙ КОРРЕКТОР ТЕКСТА ==========
+    function correctText(text) {
+        if (!text || text === 'Начните собирать ответ...') return text;
+        
+        let corrected = text;
+        
+        // 1. Базовая очистка
+        corrected = corrected.trim();
+        corrected = corrected.replace(/\s+/g, ' ');
+        
+        // 2. Исправляем пробелы перед знаками препинания
+        corrected = corrected.replace(/\s+([,.!?:;])/g, '$1');
+        
+        // 3. Добавляем пробелы после знаков препинания
+        corrected = corrected.replace(/([,.!?:;])([^\s])/g, '$1 $2');
+        
+        // 4. Исправляем кавычки на «елочки»
+        corrected = corrected.replace(/"([^"]*)"/g, '«$1»');
+        
+        // 5. Исправляем дефисы на тире
+        corrected = corrected.replace(/\s-(\s)/g, ' —$1');
+        corrected = corrected.replace(/([а-яa-z])-([а-яa-z])/g, '$1-$2');
+        
+        // 6. Троеточие
+        corrected = corrected.replace(/\.{3,}/g, '…');
+        
+        // 7. РАССТАНОВКА ЗАГЛАВНЫХ БУКВ
+        // Разбиваем на предложения по .!?…
+        const sentences = corrected.split(/([.!?…]+)/);
+        for (let i = 0; i < sentences.length; i++) {
+            // Пропускаем знаки препинания
+            if (sentences[i].match(/^[.!?…]+$/)) continue;
+            
+            let sentence = sentences[i].trim();
+            if (sentence.length > 0) {
+                // Первая буква заглавная
+                sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+                sentences[i] = sentence;
+            }
+        }
+        corrected = sentences.join('');
+        
+        // 8. Заглавные после ! и ?
+        corrected = corrected.replace(/([!?…]+\s+)([а-я])/g, (match, p1, p2) => {
+            return p1 + p2.toUpperCase();
+        });
+        
+        // 9. Исправляем "я" в начале предложения (уже сделано выше)
+        
+        // 10. Точка в конце, если нужно
+        if (corrected.length > 0 && !corrected.match(/[.!?…]$/)) {
+            corrected += '.';
+        }
+        
+        // 11. Финальная зачистка
+        corrected = corrected.replace(/\s+([.!?…])/g, '$1');
+        corrected = corrected.replace(/([.!?…])([а-яa-z])/g, '$1 $2');
+        
+        return corrected;
+    }
+
+    // Состояние
+    let stepState = {
+        currentStep: 1,
+        answers: ['', '', '', '', '', '', ''],
+        totalSteps: 7
+    };
+
+    // Заполнение всех списков фраз
+    function fillAllPhraseLists() {
+        console.log('Заполняю списки фраз...');
+
+        // Правые колонки
+        for (let i = 1; i <= 6; i++) {
+            const list = document.getElementById(`col${i}-phrases`);
+            if (list && phrases[`col${i}`]) {
+                list.innerHTML = '';
+                phrases[`col${i}`].forEach(phrase => {
+                    const li = document.createElement('li');
+                    li.textContent = phrase;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        // Создаем кнопки для шагов
+        createButtonsForStep(1, 1);
+        createButtonsForStep(2, 2);
+        createButtonsForStep(3, 3);
+        createButtonsForStep(5, 4);
+        createButtonsForStep(6, 5);
+        createButtonsForStep(7, 6);
+    }
+
+    function createButtonsForStep(stepNumber, columnNumber) {
+        const containerId = `step-col${columnNumber}-phrases`;
+        const container = document.getElementById(containerId);
+        
+        if (!container) {
+            console.error(`❌ Контейнер ${containerId} не найден!`);
+            return;
+        }
+        
+        const phraseArray = phrases[`col${columnNumber}`];
+        if (!phraseArray) return;
+
+        container.innerHTML = '';
+        phraseArray.forEach(phrase => {
+            const btn = document.createElement('button');
+            btn.className = 'step-phrase-btn';
+            btn.textContent = phrase;
+            
+            btn.onclick = (function(s, c, text) {
+                return function() {
+                    document.querySelectorAll(`#step-col${c}-phrases .step-phrase-btn`).forEach(b => {
+                        b.classList.remove('selected');
+                    });
+                    
+                    this.classList.add('selected');
+                    stepState.answers[s - 1] = text;
+                    updateAnswerBox();
+                };
+            })(stepNumber, columnNumber, phrase);
+            
+            container.appendChild(btn);
+        });
+    }
+
+    // Обновление поля ответа
+    function updateAnswerBox() {
+        const answerBox = document.getElementById('step-answer-box');
+        if (!answerBox) return;
+        
+        const parts = [];
+        for (let i = 0; i < stepState.answers.length; i++) {
+            if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
+                parts.push(stepState.answers[i]);
+            }
+        }
+        
+        const text = parts.join(' ') || 'Начните собирать ответ...';
+        
+        if (!answerBox._isEditing) {
+            answerBox.value = text;
+        }
+    }
+
+    // Переключение шагов
+    function goToStep(step) {
+        for (let i = 1; i <= stepState.totalSteps; i++) {
+            const panel = document.getElementById(`step-${i}`);
+            if (panel) panel.style.display = 'none';
+        }
+        
+        const current = document.getElementById(`step-${step}`);
+        if (current) current.style.display = 'block';
+
+        document.querySelectorAll('.step-item').forEach((item, index) => {
+            const num = index + 1;
+            item.classList.remove('active', 'completed');
+            if (num === step) item.classList.add('active');
+            else if (num < step) item.classList.add('completed');
+        });
+
+        const prevBtn = document.getElementById('step-prev');
+        if (prevBtn) prevBtn.disabled = (step === 1);
+        
+        stepState.currentStep = step;
+    }
+
+    // Сброс
+    function resetStepMode() {
+        stepState = {
+            currentStep: 1,
+            answers: ['', '', '', '', '', '', ''],
+            totalSteps: 7
+        };
+
+        for (let i = 1; i <= 6; i++) {
+            const container = document.getElementById(`step-col${i}-phrases`);
+            if (container) {
+                container.querySelectorAll('.step-phrase-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+            }
+        }
+
+        const stepSolution = document.getElementById('step-solution');
+        if (stepSolution) stepSolution.value = '';
+        
+        const answerBox = document.getElementById('step-answer-box');
+        if (answerBox) answerBox.value = 'Начните собирать ответ...';
+        
+        goToStep(1);
+    }
+
+    // Переключение режимов
+    function switchMode(mode) {
+        const randomMode = document.getElementById('random-mode');
+        const stepMode = document.getElementById('step-mode');
+        const randomBtn = document.getElementById('mode-random');
+        const stepBtn = document.getElementById('mode-step');
+        
+        if (randomMode) randomMode.classList.toggle('active', mode === 'random');
+        if (stepMode) stepMode.classList.toggle('active', mode === 'step');
+        if (randomBtn) randomBtn.classList.toggle('active', mode === 'random');
+        if (stepBtn) stepBtn.classList.toggle('active', mode === 'step');
+        
+        if (mode === 'step') resetStepMode();
+    }
+
+    // Рандомная генерация
+    function getRandomPhrase(col) {
+        return phrases[col][Math.floor(Math.random() * phrases[col].length)];
+    }
+
+    function generateResponse() {
+        const solution = document.getElementById('solution-text').value.trim();
+        if (!solution) { 
+            alert('Введите ответ'); 
+            return; 
+        }
+        
+        const resultBox = document.getElementById('result-box');
+        resultBox.textContent = '⏳ Генерация...';
+        
+        const p1 = getRandomPhrase('col1');
+        const p2 = getRandomPhrase('col2');
+        const p3 = getRandomPhrase('col3');
+        const p4 = getRandomPhrase('col4');
+        const p5 = getRandomPhrase('col5');
+        const p6 = getRandomPhrase('col6');
+        
+        const fullResponse = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
+        resultBox.textContent = fullResponse;
+    }
+
+    // Копирование
+    function copyText(text, btn) {
+        if (!text || text.includes('Начните') || text.includes('⏳')) {
+            alert('Нет текста для копирования');
+            return;
+        }
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = '✅ Скопировано!';
+            setTimeout(() => btn.textContent = orig, 2000);
+        }).catch(() => alert('Не удалось скопировать'));
+    }
+
+    // Инициализация
+    fillAllPhraseLists();
+
+    // Обработчики
+    document.getElementById('mode-random')?.addEventListener('click', () => switchMode('random'));
+    document.getElementById('mode-step')?.addEventListener('click', () => switchMode('step'));
+    document.getElementById('generate-btn')?.addEventListener('click', generateResponse);
+    
+    // Кнопка исправления в рандомном режиме
+    document.getElementById('improve-random-btn')?.addEventListener('click', function() {
+        const resultBox = document.getElementById('result-box');
+        const currentText = resultBox.textContent;
+        if (currentText && !currentText.includes('⏳') && !currentText.includes('Начните')) {
+            resultBox.textContent = correctText(currentText);
+        } else {
+            alert('Сначала сгенерируйте ответ');
+        }
+    });
+    
+    document.getElementById('copy-btn')?.addEventListener('click', function() {
+        copyText(document.getElementById('result-box').textContent, this);
+    });
+    
+    // Кнопка исправления в ручном сборе
+    document.getElementById('step-improve-btn')?.addEventListener('click', function() {
+        const answerBox = document.getElementById('step-answer-box');
+        const currentText = answerBox.value;
+        if (currentText && currentText !== 'Начните собирать ответ...') {
+            answerBox.value = correctText(currentText);
+        } else {
+            alert('Сначала соберите ответ');
+        }
+    });
+    
+    document.getElementById('step-copy-btn')?.addEventListener('click', function() {
+        copyText(document.getElementById('step-answer-box').value, this);
+    });
+    
+    document.getElementById('step-prev')?.addEventListener('click', () => {
+        if (stepState.currentStep > 1) goToStep(stepState.currentStep - 1);
+    });
+    
+    document.getElementById('step-next')?.addEventListener('click', () => {
+        if (stepState.currentStep < stepState.totalSteps) {
+            goToStep(stepState.currentStep + 1);
+        } else {
+            alert('Все шаги пройдены!');
+        }
+    });
+    
+    document.getElementById('step-skip')?.addEventListener('click', () => {
+        if (stepState.currentStep < stepState.totalSteps) {
+            goToStep(stepState.currentStep + 1);
+        }
+    });
+    
+    document.getElementById('step-solution')?.addEventListener('input', function() {
+        stepState.answers[3] = this.value;
+        updateAnswerBox();
+    });
+    
+    // Редактируемое поле
+    const answerBox = document.getElementById('step-answer-box');
+    if (answerBox) {
+        answerBox.addEventListener('focus', () => answerBox._isEditing = true);
+        answerBox.addEventListener('blur', () => {
+            answerBox._isEditing = false;
+        });
+    }
+
+    // Старт
+    goToStep(1);
+    updateAnswerBox();
+    console.log('✅ Инициализация завершена!');
+});
