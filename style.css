@@ -122,89 +122,6 @@ textarea:focus {
     border-color: #2563eb;
 }
 
-/* Настройки ИИ */
-.ai-settings {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
-    color: white;
-}
-
-.ai-settings h4 {
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-}
-
-.setting-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    gap: 12px;
-}
-
-.setting-item label {
-    min-width: 100px;
-}
-
-.setting-item input[type="range"] {
-    flex: 1;
-}
-
-.ai-status {
-    font-size: 0.9rem;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    text-align: center;
-}
-
-/* Переключатель */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
 .order-info {
     background: #f8fafc;
     border-radius: 12px;
@@ -295,7 +212,7 @@ input:checked + .slider:before {
 }
 
 .copy-btn {
-    width: 100%;
+    flex: 1;
     padding: 12px;
     background: white;
     color: #2563eb;
@@ -587,9 +504,20 @@ input:checked + .slider:before {
     line-height: 1.6;
 }
 
-/* НОВАЯ КНОПКА УЛУЧШЕНИЯ ТЕКСТА */
-.ai-improve-btn {
-    width: 100%;
+/* Группа кнопок */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.button-group .copy-btn,
+.button-group .improve-btn {
+    flex: 1;
+}
+
+/* Кнопка исправления текста */
+.improve-btn {
     padding: 12px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
@@ -602,16 +530,15 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 12px;
     transition: all 0.3s;
 }
 
-.ai-improve-btn:hover {
+.improve-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
 }
 
-.ai-improve-btn span {
+.improve-btn span {
     font-size: 1.2rem;
 }
 
@@ -696,6 +623,10 @@ input:checked + .slider:before {
     .mode-btn {
         width: 100%;
         max-width: 300px;
+    }
+    
+    .button-group {
+        flex-direction: column;
     }
 }
 
