@@ -106,428 +106,127 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // ========== ПРОСТОЙ СЛОВАРЬ ДЛЯ ПРОВЕРКИ ОРФОГРАФИИ ==========
-    const commonWords = new Set([
-        // Союзы и предлоги
-        'и', 'в', 'во', 'не', 'на', 'с', 'со', 'к', 'ко', 'у', 'о', 'об', 'от', 'ото', 'до',
-        'за', 'про', 'для', 'без', 'безо', 'над', 'под', 'подо', 'перед', 'передо', 'через',
-        'чрез', 'между', 'при', 'из', 'изо', 'из-за', 'из-под', 'через', 'сквозь',
-        
-        // Местоимения
-        'я', 'ты', 'он', 'она', 'оно', 'мы', 'вы', 'они', 'меня', 'тебя', 'его', 'её', 'нас',
-        'вас', 'их', 'мне', 'тебе', 'ему', 'ей', 'нам', 'вам', 'им', 'мой', 'твой', 'его', 'её',
-        'наш', 'ваш', 'их', 'этот', 'эта', 'это', 'эти', 'тот', 'та', 'то', 'те',
-        
-        // Часто используемые слова в поддержке
-        'спасибо', 'пожалуйста', 'извините', 'простите', 'здравствуйте', 'до свидания',
-        'помочь', 'помощь', 'вопрос', 'ответ', 'проблема', 'решение', 'работа', 'время',
-        'служба', 'поддержка', 'клиент', 'оператор', 'специалист', 'коллега',
-        'понять', 'объяснить', 'рассказать', 'уточнить', 'проверить', 'исправить',
-        'сделать', 'написать', 'позвонить', 'найти', 'посмотреть', 'подождать',
-        'минута', 'час', 'день', 'сегодня', 'завтра', 'вчера', 'сейчас', 'потом',
-        'хорошо', 'отлично', 'замечательно', 'прекрасно', 'нормально',
-        'компания', 'сайт', 'программа', 'аккаунт', 'пароль', 'доступ',
-        
-        // Глаголы в разных формах
-        'может', 'могут', 'мог', 'могла', 'могли', 'нужно', 'надо', 'должен', 'должна', 'должны',
-        'будет', 'будут', 'был', 'была', 'были', 'есть', 'нет', 'быть',
-        
-        // Прилагательные
-        'хороший', 'хорошая', 'хорошее', 'хорошие', 'плохой', 'плохая', 'плохое', 'плохие',
-        'новый', 'новая', 'новое', 'новые', 'старый', 'старая', 'старое', 'старые',
-        'большой', 'большая', 'большое', 'большие', 'маленький', 'маленькая', 'маленькое', 'маленькие',
-        
-        // Числительные
-        'один', 'одна', 'одно', 'одни', 'два', 'две', 'три', 'четыре', 'пять', 'шесть',
-        'семь', 'восемь', 'девять', 'десять', 'первый', 'второй', 'третий',
-        
-        // Вопросительные слова
-        'кто', 'что', 'какой', 'какая', 'какое', 'какие', 'чей', 'чья', 'чьё', 'чьи',
-        'где', 'куда', 'откуда', 'когда', 'почему', 'зачем', 'как', 'сколько'
-    ]);
-
-    // Словарь для исправления распространённых ошибок
-    const commonMistakes = {
-        // Ошибки в приветствиях
-        'здрасте': 'здравствуйте',
-        'здравствуй': 'здравствуйте',
-        'прив': 'привет',
-        'дарова': 'здравствуйте',
-        
-        // Ошибки в благодарностях
-        'спс': 'спасибо',
-        'пасиб': 'спасибо',
-        'сяп': 'спасибо',
-        
-        // Ошибки в извинениях
-        'извини': 'извините',
-        'прости': 'простите',
-        'сори': 'извините',
-        'сорри': 'извините',
-        
-        // Частые орфографические ошибки
-        'извеняюсь': 'извиняюсь',
-        'извиняюсь': 'извините',
-        'ложить': 'класть',
-        'покласть': 'положить',
-        'ихний': 'их',
-        'евонный': 'его',
-        'ейный': 'её',
-        'звОнит': 'звонит',
-        'звонят': 'звонят',
-        'по-моему': 'по моему',
-        'по-твоему': 'по твоему',
-        
-        // Ошибки в поддержке
-        'саппорт': 'поддержка',
-        'техподдержка': 'техническая поддержка',
-        'админ': 'администратор',
-        'комп': 'компьютер',
-        'ноут': 'ноутбук',
-        'тел': 'телефон',
-        
-        // Ошибки во времени
-        'севодня': 'сегодня',
-        'завтро': 'завтра',
-        'вчера': 'вчера',
-        'патом': 'потом',
-        'потом': 'потом'
+    // ========== СЛОВАРЬ КАНЦЕЛЯРИЗМОВ И СТОП-СЛОВ ИЗ ДОКУМЕНТА ==========
+    const badWords = {
+        // Канцеляризмы и их замена
+        'экселе': 'Excel',
+        'эксель-файл': 'Excel-файл',
+        'экселька': 'Excel-файл',
+        'в связи с': 'из-за',
+        'максимально': 'НЕ ИСПОЛЬЗОВАТЬ с прилагательными',
+        'продукт': 'подписка/услуга/приложение',
+        'beta-версия': 'бета-версия',
+        'некорректно': 'неправильно',
+        'согласно': 'смотрите',
+        'выплаты поступают с задержкой': 'деньги задерживаются',
+        'отсутствует': 'нет',
+        'находится': '',
+        'является': '',
+        'не волнуйтесь': 'успокаиваем деталями',
+        'не переживайте': 'успокаиваем деталями',
+        'оптимизировать': 'изменять/улучшать',
+        'период времени': 'период',
+        'на вкладке': 'во вкладке',
+        'тикет': 'обращение/заявка',
+        'авторизация через есиа': 'вход через Госуслуги',
+        'пин-код': 'ПИН-код',
+        'pin-код': 'ПИН-код',
+        'пинкод': 'ПИН-код',
+        'мгт-склад': 'обычный склад',
+        'бонусы wb': 'бонусы',
+        'ежемесячно': 'каждый месяц',
+        'еженедельно': 'каждую неделю',
+        'в офлайне': 'офлайн',
+        'по ссылке': 'описание ресурса',
+        'скопировать в буфер обмена': 'скопировать',
+        'веб-ссылка': 'ссылка',
+        'иной': 'другой',
+        'функционировать': 'работать',
+        'вб': 'WB',
+        'sms': 'СМС',
+        'смс': 'СМС',
+        'предмет': 'товар/вещь',
+        'позиция': 'товар/вещь',
+        'ску': 'товар',
+        'sku': 'товар',
+        'аккаунт': 'профиль',
+        'лк': 'профиль',
+        'учётная запись': 'профиль',
+        'оплата по карте': 'оплата картой',
+        'вопрос по': 'вопрос о',
+        'баг': 'техническая ошибка',
+        'бага': 'техническая ошибка',
+        'инцидент': 'техническая ошибка',
+        'нет в наличии': 'кончился/пока нет',
+        'бэкенд': 'сервис/раздел',
+        'сервер': 'сервис/раздел',
+        'в случае': 'если',
+        'скидка -50%': 'скидка 50%',
+        'для получения': 'чтобы получить',
+        'для принятия': 'чтобы принять',
+        'принять решение': 'решить',
+        'повторно': 'ещё раз/снова',
+        'почта': 'электронная почта',
+        'e-mail': 'электронная почта',
+        'имейл': 'электронная почта',
+        'пункт вывоза': 'пункт выдачи',
+        'самовывоза': 'пункт выдачи',
+        'оплатить': 'заплатить',
+        'задолженность': 'долг',
+        'корректный': 'правильный/верный',
+        'транзакция': 'платёж/возврат/операция',
+        'установление личности': 'вход по лицу',
+        'биометрия': 'вход по лицу',
+        'авторизация': 'вход',
+        'аутентификация': 'вход',
+        'идентификация': 'вход',
+        'селлер': 'продавец',
+        'поставщик': 'продавец',
+        'партнёры': 'продавцы',
+        'клиент': 'покупатель/пользователь',
+        'функционал': 'возможность',
+        'фича': 'возможность',
+        'изымать': 'выводить из оборота',
+        'далее': 'дальше',
+        'ранее': 'раньше',
+        'менее': 'меньше',
+        'удержание': 'штраф',
+        'успешно': 'убираем',
+        'брак': 'дефект',
+        'нажмите': 'кавычим всегда',
+        'данный': 'этот',
+        'данная': 'эта',
+        'данные': 'эти',
+        'в ближайшем будущем': 'скоро',
+        'в настоящее время': 'сейчас',
+        'денежные средства': 'деньги/средства',
+        'время от времени': 'иногда',
+        'во избежание': 'чтобы/чтобы не',
+        'при наличии': 'если есть',
+        'присланный': 'который прислали',
+        'нет необходимости': 'не нужно/не надо',
+        'по необходимости': 'нужно/надо',
+        'необходимо': 'нужно/надо',
+        'нет возможности': 'нельзя/не получится',
+        'в отсутствие других вариантов': 'если других вариантов нет',
+        'по причине': 'так как/потому что/из-за',
+        'помимо': 'также/ещё',
+        'таким образом': 'так',
+        'текущий': 'этот/ваш',
+        'однако': 'но',
+        'осуществить': 'сделать',
+        'совершить': 'сделать',
+        'имеет смысл': 'рекомендуем/вы можете',
+        'установленный': 'в течение',
+        'просим вас': 'пожалуйста'
     };
 
-    // ========== УЛУЧШЕННЫЙ КОРРЕКТОР ТЕКСТА ==========
-    function correctText(text) {
-        if (!text || text === 'Начните собирать ответ...') return text;
-        
-        let corrected = text;
-        
-        // 1. БАЗОВАЯ ОЧИСТКА
-        corrected = corrected.trim();
-        
-        // 2. ИСПРАВЛЕНИЕ РАСПРОСТРАНЁННЫХ ОШИБОК
-        const words = corrected.split(/(\s+|[.!?…,;:])/);
-        for (let i = 0; i < words.length; i++) {
-            const word = words[i].toLowerCase().trim();
-            if (commonMistakes[word]) {
-                // Сохраняем оригинальный регистр первой буквы
-                const isUpperCase = words[i][0] === words[i][0].toUpperCase();
-                words[i] = isUpperCase 
-                    ? commonMistakes[word].charAt(0).toUpperCase() + commonMistakes[word].slice(1)
-                    : commonMistakes[word];
-            }
-        }
-        corrected = words.join('');
-        
-        // 3. ИСПРАВЛЕНИЕ ПРОБЕЛОВ
-        corrected = corrected.replace(/\s+/g, ' ');
-        corrected = corrected.replace(/\s+([,.!?:;])/g, '$1');
-        corrected = corrected.replace(/([,.!?:;])([^\s])/g, '$1 $2');
-        
-        // 4. КАВЫЧКИ И ТИРЕ
-        corrected = corrected.replace(/"([^"]*)"/g, '«$1»');
-        corrected = corrected.replace(/\s-(\s)/g, ' —$1');
-        
-        // 5. ТРОЕТОЧИЕ
-        corrected = corrected.replace(/\.{3,}/g, '…');
-        
-        // 6. ЗАГЛАВНЫЕ БУКВЫ (НОВАЯ ВЕРСИЯ)
-        const sentences = corrected.split(/([.!?…]+\s*)/);
-        for (let i = 0; i < sentences.length; i++) {
-            let sentence = sentences[i];
-            if (sentence.length > 0 && !sentence.match(/^[.!?…]/)) {
-                // Находим первую букву в предложении
-                for (let j = 0; j < sentence.length; j++) {
-                    if (/[а-яa-z]/i.test(sentence[j])) {
-                        sentence = sentence.substring(0, j) + 
-                                  sentence[j].toUpperCase() + 
-                                  sentence.substring(j + 1);
-                        break;
-                    }
-                }
-                sentences[i] = sentence;
-            }
-        }
-        corrected = sentences.join('');
-        
-        // 7. ЗАГЛАВНЫЕ ПОСЛЕ ! И ?
-        corrected = corrected.replace(/([!?…]+\s+)([а-я])/g, (match, p1, p2) => {
-            return p1 + p2.toUpperCase();
-        });
-        
-        // 8. ТОЧКА В КОНЦЕ
-        if (corrected.length > 0 && !corrected.match(/[.!?…]$/)) {
-            corrected += '.';
-        }
-        
-        // 9. ФИНАЛЬНАЯ ЗАЧИСТКА
-        corrected = corrected.replace(/\s+([.!?…])/g, '$1');
-        corrected = corrected.replace(/([.!?…])([а-яa-z])/g, '$1 $2');
-        corrected = corrected.replace(/\s+/g, ' ');
-        
-        return corrected;
-    }
-
-    // Состояние
-    let stepState = {
-        currentStep: 1,
-        answers: ['', '', '', '', '', '', ''],
-        totalSteps: 7
-    };
-
-    // Заполнение всех списков фраз
-    function fillAllPhraseLists() {
-        console.log('Заполняю списки фраз...');
-
-        // Правые колонки
-        for (let i = 1; i <= 6; i++) {
-            const list = document.getElementById(`col${i}-phrases`);
-            if (list && phrases[`col${i}`]) {
-                list.innerHTML = '';
-                phrases[`col${i}`].forEach(phrase => {
-                    const li = document.createElement('li');
-                    li.textContent = phrase;
-                    list.appendChild(li);
-                });
-            }
-        }
-
-        // Создаем кнопки для шагов
-        createButtonsForStep(1, 1);
-        createButtonsForStep(2, 2);
-        createButtonsForStep(3, 3);
-        createButtonsForStep(5, 4);
-        createButtonsForStep(6, 5);
-        createButtonsForStep(7, 6);
-    }
-
-    function createButtonsForStep(stepNumber, columnNumber) {
-        const containerId = `step-col${columnNumber}-phrases`;
-        const container = document.getElementById(containerId);
-        
-        if (!container) {
-            console.error(`❌ Контейнер ${containerId} не найден!`);
-            return;
-        }
-        
-        const phraseArray = phrases[`col${columnNumber}`];
-        if (!phraseArray) return;
-
-        container.innerHTML = '';
-        phraseArray.forEach(phrase => {
-            const btn = document.createElement('button');
-            btn.className = 'step-phrase-btn';
-            btn.textContent = phrase;
-            
-            btn.onclick = (function(s, c, text) {
-                return function() {
-                    document.querySelectorAll(`#step-col${c}-phrases .step-phrase-btn`).forEach(b => {
-                        b.classList.remove('selected');
-                    });
-                    
-                    this.classList.add('selected');
-                    stepState.answers[s - 1] = text;
-                    updateAnswerBox();
-                };
-            })(stepNumber, columnNumber, phrase);
-            
-            container.appendChild(btn);
-        });
-    }
-
-    // Обновление поля ответа
-    function updateAnswerBox() {
-        const answerBox = document.getElementById('step-answer-box');
-        if (!answerBox) return;
-        
-        const parts = [];
-        for (let i = 0; i < stepState.answers.length; i++) {
-            if (stepState.answers[i] && stepState.answers[i].trim() !== '') {
-                parts.push(stepState.answers[i]);
-            }
-        }
-        
-        const text = parts.join(' ') || 'Начните собирать ответ...';
-        
-        if (!answerBox._isEditing) {
-            answerBox.value = text;
-        }
-    }
-
-    // Переключение шагов
-    function goToStep(step) {
-        for (let i = 1; i <= stepState.totalSteps; i++) {
-            const panel = document.getElementById(`step-${i}`);
-            if (panel) panel.style.display = 'none';
-        }
-        
-        const current = document.getElementById(`step-${step}`);
-        if (current) current.style.display = 'block';
-
-        document.querySelectorAll('.step-item').forEach((item, index) => {
-            const num = index + 1;
-            item.classList.remove('active', 'completed');
-            if (num === step) item.classList.add('active');
-            else if (num < step) item.classList.add('completed');
-        });
-
-        const prevBtn = document.getElementById('step-prev');
-        if (prevBtn) prevBtn.disabled = (step === 1);
-        
-        stepState.currentStep = step;
-    }
-
-    // Сброс
-    function resetStepMode() {
-        stepState = {
-            currentStep: 1,
-            answers: ['', '', '', '', '', '', ''],
-            totalSteps: 7
-        };
-
-        for (let i = 1; i <= 6; i++) {
-            const container = document.getElementById(`step-col${i}-phrases`);
-            if (container) {
-                container.querySelectorAll('.step-phrase-btn').forEach(b => {
-                    b.classList.remove('selected');
-                });
-            }
-        }
-
-        const stepSolution = document.getElementById('step-solution');
-        if (stepSolution) stepSolution.value = '';
-        
-        const answerBox = document.getElementById('step-answer-box');
-        if (answerBox) answerBox.value = 'Начните собирать ответ...';
-        
-        goToStep(1);
-    }
-
-    // Переключение режимов
-    function switchMode(mode) {
-        const randomMode = document.getElementById('random-mode');
-        const stepMode = document.getElementById('step-mode');
-        const randomBtn = document.getElementById('mode-random');
-        const stepBtn = document.getElementById('mode-step');
-        
-        if (randomMode) randomMode.classList.toggle('active', mode === 'random');
-        if (stepMode) stepMode.classList.toggle('active', mode === 'step');
-        if (randomBtn) randomBtn.classList.toggle('active', mode === 'random');
-        if (stepBtn) stepBtn.classList.toggle('active', mode === 'step');
-        
-        if (mode === 'step') resetStepMode();
-    }
-
-    // Рандомная генерация
-    function getRandomPhrase(col) {
-        return phrases[col][Math.floor(Math.random() * phrases[col].length)];
-    }
-
-    function generateResponse() {
-        const solution = document.getElementById('solution-text').value.trim();
-        if (!solution) { 
-            alert('Введите ответ'); 
-            return; 
-        }
-        
-        const resultBox = document.getElementById('result-box');
-        resultBox.textContent = '⏳ Генерация...';
-        
-        const p1 = getRandomPhrase('col1');
-        const p2 = getRandomPhrase('col2');
-        const p3 = getRandomPhrase('col3');
-        const p4 = getRandomPhrase('col4');
-        const p5 = getRandomPhrase('col5');
-        const p6 = getRandomPhrase('col6');
-        
-        const fullResponse = `${p1} ${p2} ${p3} ${solution} ${p4} ${p5} ${p6}`;
-        resultBox.textContent = fullResponse;
-    }
-
-    // Копирование
-    function copyText(text, btn) {
-        if (!text || text.includes('Начните') || text.includes('⏳')) {
-            alert('Нет текста для копирования');
-            return;
-        }
-        
-        navigator.clipboard.writeText(text).then(() => {
-            const orig = btn.textContent;
-            btn.textContent = '✅ Скопировано!';
-            setTimeout(() => btn.textContent = orig, 2000);
-        }).catch(() => alert('Не удалось скопировать'));
-    }
-
-    // Инициализация
-    fillAllPhraseLists();
-
-    // Обработчики
-    document.getElementById('mode-random')?.addEventListener('click', () => switchMode('random'));
-    document.getElementById('mode-step')?.addEventListener('click', () => switchMode('step'));
-    document.getElementById('generate-btn')?.addEventListener('click', generateResponse);
-    
-    // Кнопка исправления в рандомном режиме
-    document.getElementById('improve-random-btn')?.addEventListener('click', function() {
-        const resultBox = document.getElementById('result-box');
-        const currentText = resultBox.textContent;
-        if (currentText && !currentText.includes('⏳') && !currentText.includes('Начните')) {
-            resultBox.textContent = correctText(currentText);
-        } else {
-            alert('Сначала сгенерируйте ответ');
-        }
-    });
-    
-    document.getElementById('copy-btn')?.addEventListener('click', function() {
-        copyText(document.getElementById('result-box').textContent, this);
-    });
-    
-    // Кнопка исправления в ручном сборе
-    document.getElementById('step-improve-btn')?.addEventListener('click', function() {
-        const answerBox = document.getElementById('step-answer-box');
-        const currentText = answerBox.value;
-        if (currentText && currentText !== 'Начните собирать ответ...') {
-            answerBox.value = correctText(currentText);
-        } else {
-            alert('Сначала соберите ответ');
-        }
-    });
-    
-    document.getElementById('step-copy-btn')?.addEventListener('click', function() {
-        copyText(document.getElementById('step-answer-box').value, this);
-    });
-    
-    document.getElementById('step-prev')?.addEventListener('click', () => {
-        if (stepState.currentStep > 1) goToStep(stepState.currentStep - 1);
-    });
-    
-    document.getElementById('step-next')?.addEventListener('click', () => {
-        if (stepState.currentStep < stepState.totalSteps) {
-            goToStep(stepState.currentStep + 1);
-        } else {
-            alert('Все шаги пройдены!');
-        }
-    });
-    
-    document.getElementById('step-skip')?.addEventListener('click', () => {
-        if (stepState.currentStep < stepState.totalSteps) {
-            goToStep(stepState.currentStep + 1);
-        }
-    });
-    
-    document.getElementById('step-solution')?.addEventListener('input', function() {
-        stepState.answers[3] = this.value;
-        updateAnswerBox();
-    });
-    
-    // Редактируемое поле
-    const answerBox = document.getElementById('step-answer-box');
-    if (answerBox) {
-        answerBox.addEventListener('focus', () => answerBox._isEditing = true);
-        answerBox.addEventListener('blur', () => {
-            answerBox._isEditing = false;
-        });
-    }
-
-    // Старт
-    goToStep(1);
-    updateAnswerBox();
-    console.log('✅ Инициализация завершена!');
-});
+    // Стоп-слова (мусорные слова для удаления)
+    const stopWords = new Set([
+        'просто', 'конкретно', 'реально', 'на самом деле', 'вообще', 'типа',
+        'как бы', 'это самое', 'ну', 'вот', 'это', 'того', 'же', 'бы',
+        'ли', 'ведь', 'даже', 'уж', 'всё', 'ещё', 'почти', 'вроде',
+        'якобы', 'мол', 'дескать', 'практически', 'фактически', 'буквально',
+        'собственно', 'собственно говоря', 'строго говоря', 'вообще-то',
+        'в принципе', 'по сути', 'по идее', 'как правило', 'как минимум',
+        '
